@@ -72,7 +72,7 @@ I am going to use the required technologies in the following ways.
 - **HTML** - Provides the basic structure of the page, including the Home, Login, Public, Contact, and Help pages.
 - **CSS** - Helps website adjust to fit any device and look nice
 - **React** - Facilitates authentication and adjusts files that are shown based on the account's access level
-- **Service** - Upload documents, assign access levels, publish to unique links, register/login to see files of different access levels
+- **Service** - Upload documents, assign access levels, publish to unique links, register/login to see files of different access levels. Use 3rd party API Genderize to infer gender based on name and offer "free" access level based on gender
 - **DB/Login** - If a user does not login, they can see all files given the "public" access level. If they do, they can be assigned further access levels by the author so they can see more files.
 - **WebSocket** - Commenting, liking, etc.
 
