@@ -12,7 +12,7 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 - [x] A concise and compelling elevator pitch
 - [x] Description of key features
 - [x] Description of how you will use each technology
-- [ ] One or more rough sketches of your application. Images must be embedded in this file using Markdown image references.
+- [x] One or more rough sketches of your application. Images must be embedded in this file using Markdown image references.
 
 ### Elevator pitch
 
@@ -20,7 +20,17 @@ Do you ever have so much to say that you wish you could just… take your brain 
 
 ### Design
 
-![Design image](placeholder.png)
+Home page to become the admin of a new ShowBrain
+
+![Home page](design_images/showbrain_home.png)
+
+ShowBrain of Tom as viewed by a stranger
+
+![Stranger ShowBrain](design_images/showbrain_stranger.png)
+
+ShowBrain of Tom as viewed by a friend
+
+![Friend ShowBrain](design_images/showbrain_friend.png)
 
 Here is a rough sequence diagram that shows how ShowBrain works. It is essentially a social media/blogging application, but with a focus on small groups and personal utility rather than making lots of things known to the public.
 
