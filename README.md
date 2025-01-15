@@ -1,68 +1,78 @@
-# Your startup name here
+# ShowBrain
 
 [My Notes](notes.md)
 
-A brief description of the application here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
-
-> [!NOTE]
->  This is a template for your startup application. You must modify this `README.md` file for each phase of your development. You only need to fill in the section for each deliverable when that deliverable is submitted in Canvas. Without completing the section for a deliverable, the TA will not know what to look for when grading your submission. Feel free to add additional information to each deliverable description, but make sure you at least have the list of rubric items and a description of what you did for each item.
-
-> [!NOTE]
->  If you are not familiar with Markdown then you should review the [documentation](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax) before continuing.
 
 ## 🚀 Specification Deliverable
 
-> [!NOTE]
->  Fill in this sections as the submission artifact for this deliverable. You can refer to this [example](https://github.com/webprogramming260/startup-example/blob/main/README.md) for inspiration.
-
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] Proper use of Markdown
-- [ ] A concise and compelling elevator pitch
-- [ ] Description of key features
-- [ ] Description of how you will use each technology
+- [x] Proper use of Markdown
+- [x] A concise and compelling elevator pitch
+- [x] Description of key features
+- [x] Description of how you will use each technology
 - [ ] One or more rough sketches of your application. Images must be embedded in this file using Markdown image references.
 
 ### Elevator pitch
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Do you ever have so much to say that you wish you could just… take your brain out and show someone? ShowBrain can help! It's like Facebook but for longform text content. (And without feeds and privacy issues.) It's a website that takes a collection of personal files (for example, class notes, or a digital journal) and helps you safely publish them for friends to see and comment on. By default, all files are private, and access levels are easy to configure: for example, allow your coworkers to access one set of files, allow your family to access all of those plus some more, let one specific friend have access to one specific file, and so forth.
 
 ### Design
 
 ![Design image](placeholder.png)
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Here is a rough sequence diagram that shows how ShowBrain works. It is essentially a social media/blogging application, but with a focus on small groups and personal utility rather than making lots of things known to the public.
 
 ```mermaid
 sequenceDiagram
-    actor You
-    actor Website
-    You->>Website: Replace this with your design
+    actor Friend
+    actor Admin
+    participant ShowBrain
+    participant NewSite
+    Admin->>ShowBrain: Admin logs into ShowBrain and creates a new site
+    ShowBrain->>NewSite: Creates NewSite with admin "Admin"
+    NewSite-->>Admin: Admin access to NewSite
+    Admin->>NewSite: Upload files and assign access levels
+    NewSite-->>Admin: Unique links to files and "blog format"
+    Friend->>ShowBrain: Registers on ShowBrain
+    Friend->>NewSite: Accesses NewSite through ShowBrain account
+    NewSite-->>Friend: Automatically assigned "Public" access level
+    NewSite-->>Admin: Shows that user has joined NewSite
+    NewSite-->>Friend: Public files and comments
+    Admin->>NewSite: Assigns friend access level of "Friend"
+    NewSite-->>Friend: Receives access level "Friend"
+    Friend->>NewSite: Accesses NewSite with ShowBrain account
+    NewSite-->>Friend: Files and comments with "Public" and "Friend" access levels
+    Friend->>NewSite: Comments on files
+    NewSite-->>Admin: Comments made visible via WebSocket
 ```
 
 ### Key features
 
-- Describe your key feature
-- Describe your key feature
-- Describe your key feature
+- Secure register/login over HTTPS
+- Upload personal documents/digital journal to publish them online
+- Set and fine-tune access levels for each file or collection of files
+- Allow friends to register, get assigned an access level, and stay connected by interacting with your documents
 
 ### Technologies
 
 I am going to use the required technologies in the following ways.
 
-- **HTML** - Description here
-- **CSS** - Description here
-- **React** - Description here
-- **Service** - Description here
-- **DB/Login** - Description here
-- **WebSocket** - Description here
+- **HTML** - Provides the basic structure of the page, including the Home, Login, Public, Contact, and Help pages.
+- **CSS** - Helps website adjust to fit any device and look nice
+- **React** - Facilitates authentication and adjusts files that are shown based on the account's access level
+- **Service** - Upload documents, assign access levels, publish to unique links, register/login to see files of different access levels
+- **DB/Login** - If a user does not login, they can see all files given the "public" access level. If they do, they can be assigned further access levels by the author so they can see more files.
+- **WebSocket** - Commenting, liking, etc.
 
 ## 🚀 AWS deliverable
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **Server deployed and accessible with custom domain name** - [My server link](https://yourdomainnamehere.click).
+- [x] **Server deployed and accessible with custom domain name** - [showbrain.net](https://showbrain.net).
+
+Note: the request is still processing and AWS says it could take up to seven days
 
 ## 🚀 HTML deliverable
 
