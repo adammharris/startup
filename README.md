@@ -82,8 +82,6 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 - [x] **Server deployed and accessible with custom domain name** - [showbrain.net](https://showbrain.net).
 
-Note: the request is still processing and AWS says it could take up to seven days
-
 ## 🚀 HTML deliverable
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
