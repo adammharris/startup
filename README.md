@@ -86,15 +86,15 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **HTML pages** - I did not complete this part of the deliverable.
-- [ ] **Proper HTML element usage** - I did not complete this part of the deliverable.
-- [ ] **Links** - I did not complete this part of the deliverable.
-- [ ] **Text** - I did not complete this part of the deliverable.
-- [ ] **3rd party API placeholder** - I did not complete this part of the deliverable.
-- [ ] **Images** - I did not complete this part of the deliverable.
-- [ ] **Login placeholder** - I did not complete this part of the deliverable.
-- [ ] **DB data placeholder** - I did not complete this part of the deliverable.
-- [ ] **WebSocket placeholder** - I did not complete this part of the deliverable.
+- [x] **HTML pages** - I added the following HTML files: about, blog, comments, dashboard, help, index, login.
+- [x] **Proper HTML element usage** - I used `body`, `nav`, `main`, `header`, and `footer` correctly, among other HTMl elements
+- [x] **Links** - All the pages are linked together appropriately
+- [x] **Text** - Textual content, both real and placeholders, are present
+- [x] **3rd party API placeholder** - The Genderize API didn't end up being a great idea, so I decided to put a placeholder for the PurgoMalum PAI in case there is ever profanity in the comments
+- [x] **Images** - Real and placeholder images have been added.
+- [x] **Login placeholder** - Login placeholder has been added
+- [x] **DB data placeholder** - DB data placeholders have been added.
+- [x] **WebSocket placeholder** - WebSocket placeholder has been added.
 
 ## 🚀 CSS deliverable
 
