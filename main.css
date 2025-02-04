@@ -1,0 +1,83 @@
+* {
+    text-align: center;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+body {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    height: 100vh;
+}
+header {
+    display: flex;
+    flex: 0 40px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 80px;
+    background-color: white;
+    align-items: center;
+}
+
+header h1 {
+    flex: 0 0 25%;
+}
+
+header nav {
+    display: flex;
+    flex: 0 0 75%;
+    flex-direction: row;
+}
+
+header menu {
+    display: flex;
+    list-style: none;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: space-between;
+}
+
+header li {
+    display: flex;
+    flex-direction: row;
+    border: solid 1px black;
+    width: 100%;
+    height: 100%;
+    flex: 1;
+}
+
+header a {
+    text-decoration: none;
+}
+
+footer {
+    flex: 0 40px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: white;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-top: 150px; /* Push content down to avoid overlap with the fixed header */
+    margin-bottom: 80px; /* Leave space so content doesn't go under the fixed footer */
+    padding: 20px;
+}
+
+nav li {
+    flex: 0.5;
+    flex-direction: row;
+}
+
+.list section {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+}
