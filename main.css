@@ -5,6 +5,11 @@
     box-sizing: border-box;
 }
 
+body {
+    margin-bottom: 80px;
+    background-color:rgb(145, 127, 80);
+}
+
 html, body, footer {
     display: flex;
     height: 100%;
@@ -49,18 +54,79 @@ header a {
 }
 
 main {
-    flex: 6;
+    display: flex;
+    flex-direction: column;
     height: 100%;
 }
 
 footer {
-    flex: 1;
-    position: sticky;
+    height: 40px;
+    position: fixed;
     bottom: 0;
     width: 100%;
     background-color: white;
 }
 
-.list section {
+#title {
     display: flex;
+    justify-content: center;
+    flex-direction: column;
+    flex: 1;
+    margin: 20px;
+    padding: 20px;
+    background-image: url("media/stock-river.jpg");
+}
+
+#title h1, #title p {
+    text-align: left;
+    color: white;
+}
+
+#info {
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+}
+
+#info section {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+}
+
+#info section img {
+    float: left;
+    width: 40%;
+    margin: 20px;
+}
+
+#info section div {
+    float: right;
+    margin: 20px;
+}
+#info div p, #info div h1 {
+    text-align: left;
+}
+
+.list {
+    background-color:paleturquoise;
+    margin: 20px;
+    border: solid 1px black;
+    border-radius: 20px;
+    padding:15px;
+}
+
+.list section {
+    flex: 1;
+    display: flex;
+    margin: 20px;
+}
+
+.list section div {
+    flex: 1;
+    padding: 10px;
+    border: solid 1px black;
+    border-radius: 10px;
+    margin:5px;
+    background-color:rgb(182, 253, 168);
 }
