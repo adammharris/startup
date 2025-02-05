@@ -1,0 +1,22 @@
+
+main {
+    margin: 20px;
+    display: flex;
+}
+
+main h1 {
+    text-align: left;
+    color: white;
+    border-bottom: solid 1px black;
+    margin: 20px;
+}
+
+details {
+    padding: 20px;
+}
+
+main p, summary {
+    background-color: aliceblue;
+    opacity: 50%;
+    padding: 20px;
+}
