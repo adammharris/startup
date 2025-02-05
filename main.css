@@ -23,6 +23,7 @@ header {
     width: 100%;
     background-color: white;
     align-items: center;
+    z-index: 1000;
 }
 
 header h1 {
