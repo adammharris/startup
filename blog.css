@@ -1,0 +1,12 @@
+main {
+    display: flex;
+    margin-bottom: 80px;
+}
+
+main div {
+    margin:20px;
+    padding:20px;
+    background-color: aliceblue;
+    border: solid 1px black;
+    border-radius: 20px;
+}

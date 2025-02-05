@@ -45,8 +45,10 @@ header menu {
 }
 
 header li {
+    border-radius: 10px;
     border: solid 1px black;
     padding: 20px;
+    margin:5px;
 }
 
 header a {
@@ -159,6 +161,12 @@ footer {
     }
     #info section div {
         width: 100%;
+    }
+    header {
+        flex-direction: column;
+    }
+    header h1 {
+        padding:0px;
     }
 }
 
