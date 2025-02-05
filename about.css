@@ -1,0 +1,43 @@
+main {
+    display: grid;
+    margin: 20px;
+    padding: 20px;
+}
+h1, p {
+    text-align: left;
+}
+
+p, blockquote {
+    padding: 10px;
+    text-align: left;
+}
+
+blockquote {
+    margin-left: 20px;
+}
+
+main h1 {
+    color: white;
+    text-shadow: black;
+    border-bottom: solid 1px black;
+}
+
+aside {
+    padding:20px;
+    margin:20px;
+    border:solid 1px black;
+    border-radius: 20px;
+    background-color: aliceblue;
+}
+
+footer {
+    text-align: center;
+}
+
+main div {
+    padding: 20px;
+    border-radius: 20px;
+    background-color: aliceblue;
+    opacity: 50%;
+    margin-bottom: 100px;
+}
