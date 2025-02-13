@@ -2,7 +2,7 @@ import React from 'react';
 
 export function Login() {
   return (
-    <main id="loginform">
+    <main id="loginform" className="body bg-secondary text-dark">
         <h1>Login</h1>
         <form method="get" action="dashboard.html">
             <div>

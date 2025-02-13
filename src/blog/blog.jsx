@@ -2,7 +2,7 @@ import React from 'react';
 
 export function Blog() {
   return (
-    <main>
+    <main className="body bg-secondary text-dark">
         <div>
             <h1>Blog</h1>
             <p>Welcome to the ShowBrain blog!</p>

@@ -2,7 +2,7 @@ import React from 'react';
 
 export function About() {
   return (
-    <main>
+    <main className="body bg-secondary text-dark">
         <h1>About</h1>
         <aside>
             <h3>ShowBrain is a different kind of social media.</h3> 

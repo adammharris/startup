@@ -2,7 +2,7 @@ import React from 'react';
 
 export function Home() {
   return (
-    <main>
+    <main className="body bg-secondary text-dark">
         <div id="title">
             <h1>Welcome to ShowBrain!</h1>
             <p>A simple, minimal, blog-like space for sharing your thoughts.</p>

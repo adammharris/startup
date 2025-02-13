@@ -2,7 +2,7 @@ import React from 'react';
 
 export function Dashboard() {
   return (
-    <main id="dashboard">
+    <main id="dashboard" className="body bg-secondary text-dark">
         <div class="caption">
             <h1>Welcome to your ShowBrain!</h1>
             <p>(This is a demo page, by the way. The functionality is not yet fully implemented.)</p>
