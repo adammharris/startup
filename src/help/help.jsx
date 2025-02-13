@@ -1,4 +1,5 @@
 import React from 'react';
+import './help.css'
 
 export function Help() {
   return (
