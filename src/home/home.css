@@ -1,0 +1,64 @@
+.list {
+    background-color:paleturquoise;
+    margin: 20px;
+    border: solid 1px black;
+    border-radius: 20px;
+    padding:15px;
+}
+
+.list section {
+    flex: 1;
+    display: flex;
+    margin: 20px;
+}
+
+.list section div {
+    flex: 1;
+    padding: 10px;
+    border: solid 1px black;
+    border-radius: 10px;
+    margin:5px;
+    background-color:rgb(182, 253, 168);
+}
+
+.list section div img {
+    animation: wiggle 5s ease-in-out infinite;
+}
+
+#info {
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+    margin-bottom: 80px;
+}
+
+#info section {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    margin: 20px;
+}
+
+#info section img {
+    float: left;
+    width: 40%;
+    margin: 20px;
+}
+
+#info section div {
+    float: right;
+    margin: 20px;
+    border: solid 1px black;
+    padding: 15px;
+    background-color: paleturquoise;
+    border-radius: 20px;
+}
+#info div p, #info div h1 {
+    text-align: left;
+}
+
+#info button {
+    margin-bottom: 80px;
+    padding:15px;
+    background-color:rgb(182, 253, 168)
+}
