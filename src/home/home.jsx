@@ -1,6 +1,7 @@
 import React from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import Card from 'react-bootstrap/Card'
-import "./home.css"
+//import "./home.css"
 
 export function Home() {
   return (
@@ -14,33 +15,40 @@ export function Home() {
             </Card.Body>
         </Card>
 
-        <div className="card-deck">
-            <h1>How does it work?</h1>
-            <section>
-            <div className="card">
-                <img src="icons/upload_journal.svg" className="card-img-top"/>
-                <div className="card-body">
-                    <h3 className="card-title">Upload your journal</h3>
-                    <p className="card-text">It all starts by uploading your journal. Don't worry; we can't see it, and it is private by default.</p>
-                </div>
-            </div>
+        <CardGroup>
+            <Card>
+                <Card.Img variant="top" src="icons/upload_journal.svg" fluid />
+                <Card.Body>
+                <Card.Title>
+                Upload your journal
+                </Card.Title>
+                <Card.Text>
+                It all starts by uploading your journal. Don't worry; we can't see it, and it is private by default.
+                </Card.Text>
+                </Card.Body>
+            </Card>
+            <Card>
+                <Card.Img variant="top" src="icons/upload_journal.svg" fluid />
+                <Card.Body>
+                <Card.Title>
+                Assign access levels
+                </Card.Title>
+                <Card.Text>
+                Odds are, you don't want everyone seeing everything, but you want some people to see some things. Tell us who should see what.
+                </Card.Text>
+                </Card.Body>
+            </Card>
+            <Card>
+                <CardImg variant="top" src="icons/upload_journal.svg" fluid />
+                <Card.Body>
+                <Card.Title>Share with friends</Card.Title>
+                <Card.Text>
+                When your friends register, you can assign them access levels too, so only people marked as "Friend" will see entries you dedicate to friends. 
+                </Card.Text>
+                </Card.Body>
+            </Card>
+        </CardGroup>
 
-            <div className="card">
-                <img src="icons/access-levels.svg" className="card-img-top"></img>
-                <div className="card-body">
-                    <h3 className="card-title">Assign access levels</h3>
-                    <p className="card-text">Odds are, you don't want everyone seeing everything, but you want some people to see some things. Tell us who should see what.</p>
-                </div>
-            </div>
-
-            <div className="card">
-                <img src="icons/share_with_friends.svg" className="card-img-top"></img>
-
-                <h3 className="card-title">Share with friends</h3>
-                <p>When your friends register, you can assign them access levels too, so only people marked as "Friend" will see entries you dedicate to friends.</p>
-            </div>
-        </section>
-        </div>
 
         <div id="info">
             <section className="card">

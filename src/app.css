@@ -44,20 +44,6 @@ footer a {
     float: right;
 }
 
-#title {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    flex: 1;
-    margin: 20px;
-    padding: 20px;
-    background-image: url("media/stock-river.jpg");
-}
-
-#title h1, #title p {
-    text-align: left;
-}
-
 @media (orientation: portrait) {
     .list section {
         flex-direction: column;

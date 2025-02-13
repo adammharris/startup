@@ -1,28 +1,31 @@
 import React from 'react';
 import './help.css'
+import { Accordion, AccordionBody, AccordionHeader, AccordionItem } from 'react-bootstrap';
 
 export function Help() {
   return (
     <main className="body bg-secondary text-dark">
         <h1>Help</h1>
         <p>Here are some common issues.</p>
-        <h2></h2>
-        <details>
-            <summary>
+        <Accordion>
+            <Accordion.Item eventKey="0">
+                <Accordion.Header>
                 Why doesn't this website work yet?
-            </summary>
-            <p>
+                </Accordion.Header>
+                <AccordionBody>
                 Unfortunately, I have only made the HTML and CSS. Stay tuned for JavaScript, React, and Websocket.
-            </p>
-        </details>
-        <details>
-            <summary>
+                </AccordionBody>
+            </Accordion.Item>
+            <AccordionItem eventKey="1">
+                <AccordionHeader>
                 Why was ShowBrain made?
-            </summary>
-            <p>
+                </AccordionHeader>
+                <AccordionBody>
                 See the <a href="about.html">about page</a>.
-            </p>
-        </details>
+                </AccordionBody>
+            </AccordionItem>
+        </Accordion>
+        
     </main>
   );
 }
