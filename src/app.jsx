@@ -11,7 +11,7 @@ import { Help } from './help/help';
 export default function App() {
   return (
     <BrowserRouter>
-    <div className="body bg-secondary text-dark">
+    <div className="body bg-secondary text-light">
         <header className="container-fluid bg-primary">
             <nav className="navbar fixed-top navbar-dark">
                 <div className="navbar-brand">
@@ -58,4 +58,4 @@ export default function App() {
 
 function NotFound() {
     return <main className="container-fluid bg-secondary text-center">404: Return to sender. Address unknown.</main>;
-  }
+}
