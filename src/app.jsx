@@ -4,8 +4,8 @@ import './app.css';
 
 export default function App() {
   return (
-    <div className="body bg-dark text-light">
-        <header className="container-fluid">
+    <div className="body bg-secondary text-dark">
+        <header className="container-fluid bg-primary">
             <nav className="navbar fixed-top navbar-dark">
                 <div className="navbar-brand">
                     ShowBrain
