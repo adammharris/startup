@@ -2,22 +2,26 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Card from 'react-bootstrap/Card'
 import CardGroup from 'react-bootstrap/CardGroup'
 import Container from 'react-bootstrap/Container'
+import upload from './upload_journal.svg'
+import access from './access_levels.svg'
+import share from './share_with_friends.svg'
 
 export function Home() {
   return (
     <Container className="mt-5 p-5" fluid  >
         <Card className="p-5 m-4">
             <Card.Title>
-            Welcome to ShowBrain!
+            <h1>Welcome to ShowBrain!</h1>
             </Card.Title>
+            <hr></hr>
             <Card.Body>
-            A simple, minimal, blog-like space for sharing your thoughts.
+            <p>A simple, minimal, blog-like space for sharing your thoughts.</p>
             </Card.Body>
         </Card>
 
         <CardGroup>
-            <Card className="p-5 p-md-5 m-md-4">
-            <Card.Img variant="top" src="./upload_journal.svg" fluid />
+            <Card className="m-0 p-2 p-sm-3 p-md-4 m-md-4">
+            <Card.Img variant="top" src={upload} fluid/>
                 <Card.Body>
                 <Card.Title>
                 Upload your journal
@@ -27,8 +31,8 @@ export function Home() {
                 </Card.Text>
                 </Card.Body>
             </Card>
-            <Card className="p-5 p-md-5 m-md-4">
-            <Card.Img variant="top" src="./access-levels.svg" fluid />
+            <Card className="m-0 p-2 p-sm-3 p-md-4 m-md-4">
+            <Card.Img variant="top" src={access} fluid/>
                 <Card.Body>
                 <Card.Title>
                 Assign access levels
@@ -38,8 +42,8 @@ export function Home() {
                 </Card.Text>
                 </Card.Body>
             </Card>
-            <Card className="p-5 p-md-5 m-md-4">
-            <Card.Img variant="top" src="./share_with_friends.svg" fluid />
+            <Card className="m-0 p-2 p-sm-3 p-md-4 m-md-4">
+            <Card.Img variant="top" src={share} fluid/>
                 <Card.Body>
                 <Card.Title>Share with friends</Card.Title>
                 <Card.Text>

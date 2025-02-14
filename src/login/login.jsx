@@ -1,13 +1,15 @@
 //import React from 'react';
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button';
-//import './login.css'
+import Card from 'react-bootstrap/Card'
+
 export function Login() {
   return (
-    <main className="m-5">
-        <div className="m-5"></div>
-        <Form>
-            <h1 className="mt-5 p-4">Login</h1>
+    <main className="p-5">
+        <Card className="m-5">
+        <Form className='p-4'>
+            <h1>Login</h1>
+            <hr/>
             <Form.Group className="mb-3" controlID="formBasicEmail">
                 <Form.Label>Email</Form.Label>
                 <Form.Control type="email" placeholder="your@email.com" />
@@ -20,6 +22,7 @@ export function Login() {
                 Submit
             </Button>
         </Form>
+        </Card>
     </main>
   );
 }

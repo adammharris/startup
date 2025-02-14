@@ -1,11 +1,14 @@
 //import React from 'react';
 //import './help.css'
 import { Accordion, AccordionBody, AccordionHeader, AccordionItem } from 'react-bootstrap';
+import Card from 'react-bootstrap/Card'
 
 function Help() {
   return (
-    <main className="body bg-secondary text-dark m-5">
+    <main className="body bg-secondary text-dark p-5 m-5">
+      <Card className="p-4">
         <h1>Help</h1>
+        <hr/>
         <p>Here are some common issues.</p>
         <Accordion>
             <Accordion.Item eventKey="0">
@@ -25,7 +28,7 @@ function Help() {
                 </AccordionBody>
             </AccordionItem>
         </Accordion>
-        
+        </Card>
     </main>
   );
 }

@@ -1,10 +1,11 @@
-//import React from 'react';
-//import './about.css'
+import Card from 'react-bootstrap/Card'
 
 function About() {
   return (
-    <main className="body bg-secondary text-dark m-5">
+    <main className="body bg-secondary text-dark p-5">
+        <Card className='m-3 p-4 mt-5'>
         <h1 className="m-auto">  About</h1>
+        <hr/>
         <aside>
             <h3>ShowBrain is a different kind of social media.</h3> 
             <p>For those who prefer a slower, steadier pace, who don't want to get swept away in the flood of irresponsible oversharing— ShowBrain is here to fill that need.</p>
@@ -39,6 +40,7 @@ function About() {
                 Hopefully ShowBrain's influence can make a mark on the Internet, and set a precedent for more genuine and human online interaction. And hopefully ShowBrain can help <i>you</i> find a voice in a world where it can be difficult to be heard.
             </p>
         </div>
+        </Card>
     </main>
   );
 }
