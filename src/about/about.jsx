@@ -1,10 +1,10 @@
-import React from 'react';
-import './about.css'
+//import React from 'react';
+//import './about.css'
 
-export function About() {
+function About() {
   return (
-    <main className="body bg-secondary text-dark">
-        <h1>About</h1>
+    <main className="body bg-secondary text-dark m-5">
+        <h1 className="m-auto">  About</h1>
         <aside>
             <h3>ShowBrain is a different kind of social media.</h3> 
             <p>For those who prefer a slower, steadier pace, who don't want to get swept away in the flood of irresponsible oversharing— ShowBrain is here to fill that need.</p>
@@ -42,3 +42,5 @@ export function About() {
     </main>
   );
 }
+
+export default About

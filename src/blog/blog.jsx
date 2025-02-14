@@ -1,10 +1,10 @@
-import React from 'react';
-import './blog.css'
+//import React from 'react';
+//import './blog.css'
 
-export function Blog() {
+function Blog() {
   return (
-    <main className="body bg-secondary text-dark">
-        <div>
+    <main className="body bg-secondary text-dark m-5">
+        <div className="m-5">
             <h1>Blog</h1>
             <p>Welcome to the ShowBrain blog!</p>
         </div>
@@ -14,3 +14,5 @@ export function Blog() {
     </main>
   );
 }
+
+export default Blog

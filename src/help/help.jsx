@@ -1,10 +1,10 @@
-import React from 'react';
-import './help.css'
+//import React from 'react';
+//import './help.css'
 import { Accordion, AccordionBody, AccordionHeader, AccordionItem } from 'react-bootstrap';
 
-export function Help() {
+function Help() {
   return (
-    <main className="body bg-secondary text-dark">
+    <main className="body bg-secondary text-dark m-5">
         <h1>Help</h1>
         <p>Here are some common issues.</p>
         <Accordion>
@@ -29,3 +29,5 @@ export function Help() {
     </main>
   );
 }
+
+export default Help

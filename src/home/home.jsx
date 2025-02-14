@@ -1,12 +1,12 @@
-import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Card from 'react-bootstrap/Card'
-//import "./home.css"
+import CardGroup from 'react-bootstrap/CardGroup'
+import Container from 'react-bootstrap/Container'
 
 export function Home() {
   return (
-    <main className="container-fluid">
-        <Card>
+    <Container className="mt-5 p-5" fluid  >
+        <Card className="p-5 m-4">
             <Card.Title>
             Welcome to ShowBrain!
             </Card.Title>
@@ -16,8 +16,8 @@ export function Home() {
         </Card>
 
         <CardGroup>
-            <Card>
-                <Card.Img variant="top" src="icons/upload_journal.svg" fluid />
+            <Card className="p-5 p-md-5 m-md-4">
+            <Card.Img variant="top" src="./upload_journal.svg" fluid />
                 <Card.Body>
                 <Card.Title>
                 Upload your journal
@@ -27,8 +27,8 @@ export function Home() {
                 </Card.Text>
                 </Card.Body>
             </Card>
-            <Card>
-                <Card.Img variant="top" src="icons/upload_journal.svg" fluid />
+            <Card className="p-5 p-md-5 m-md-4">
+            <Card.Img variant="top" src="./access-levels.svg" fluid />
                 <Card.Body>
                 <Card.Title>
                 Assign access levels
@@ -38,8 +38,8 @@ export function Home() {
                 </Card.Text>
                 </Card.Body>
             </Card>
-            <Card>
-                <CardImg variant="top" src="icons/upload_journal.svg" fluid />
+            <Card className="p-5 p-md-5 m-md-4">
+            <Card.Img variant="top" src="./share_with_friends.svg" fluid />
                 <Card.Body>
                 <Card.Title>Share with friends</Card.Title>
                 <Card.Text>
@@ -48,18 +48,8 @@ export function Home() {
                 </Card.Body>
             </Card>
         </CardGroup>
-
-
-        <div id="info">
-            <section className="card">
-                <img src="media_relationships.jpg" className="card-img-left"></img>
-                <div>
-                <h1>Fine-tuned control</h1>
-                <p>Unlike other platforms, we understand that not everybody you interact with is necessarily a "friend." You can also mark people as "family," "coworker," "partner," or whatever else you want to call them. Each group of people will only see the entries that you say they can see. And people can belong to more than one category too, so your family can see the entries meant for them as well as the ones meant for your friends. Control can be fine-tuned down to the individual, so you can make entries for just one person to read if you like.</p>
-                </div>
-            </section>
-            <button onclick="location.replace('login.html')">Get Started</button>
-        </div>
-    </main>
+    </Container>
   );
 }
+
+export default Home
