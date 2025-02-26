@@ -1,9 +1,10 @@
 import Card from 'react-bootstrap/Card'
+import Container from 'react-bootstrap/Container'
 
 function About() {
   return (
-    <main className="body bg-secondary text-dark p-5">
-        <Card className='m-3 p-4 mt-5'>
+    <Container fluid>
+        <Card className='m-5 p-4 mx-auto' style={{ maxWidth: '800px' }}>
         <h1 className="m-auto">  About</h1>
         <hr/>
         <aside>
@@ -41,7 +42,7 @@ function About() {
             </p>
         </div>
         </Card>
-    </main>
+    </Container>
   );
 }
 

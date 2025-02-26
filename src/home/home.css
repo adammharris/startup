@@ -1,0 +1,6 @@
+@media (max-width: 576px) {
+    .card-responsive {
+      max-width: 300px; /* Adjust this value as needed for readability */
+      margin: 0 auto;    /* Center the card */
+    }
+  }

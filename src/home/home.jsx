@@ -1,14 +1,14 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
 import Card from 'react-bootstrap/Card'
 import CardGroup from 'react-bootstrap/CardGroup'
 import Container from 'react-bootstrap/Container'
 import upload from './upload_journal.svg'
 import access from './access_levels.svg'
 import share from './share_with_friends.svg'
+import './Home.css'
 
 export function Home() {
   return (
-    <Container className="mt-5 p-5" fluid  >
+    <Container fluid style={{ maxWidth: '800px' }} >
         <Card className="p-5 m-4">
             <Card.Title>
             <h1>Welcome to ShowBrain!</h1>
@@ -19,8 +19,8 @@ export function Home() {
             </Card.Body>
         </Card>
 
-        <CardGroup>
-            <Card className="m-0 p-2 p-sm-3 p-md-4 m-md-4">
+        <CardGroup className="d-flex flex-column flex-sm-row justify-content-center">
+            <Card className="card-responsive">
             <Card.Img variant="top" src={upload} fluid/>
                 <Card.Body>
                 <Card.Title>
@@ -31,7 +31,7 @@ export function Home() {
                 </Card.Text>
                 </Card.Body>
             </Card>
-            <Card className="m-0 p-2 p-sm-3 p-md-4 m-md-4">
+            <Card className="card-responsive">
             <Card.Img variant="top" src={access} fluid/>
                 <Card.Body>
                 <Card.Title>
@@ -42,7 +42,7 @@ export function Home() {
                 </Card.Text>
                 </Card.Body>
             </Card>
-            <Card className="m-0 p-2 p-sm-3 p-md-4 m-md-4">
+            <Card className="card-responsive">
             <Card.Img variant="top" src={share} fluid/>
                 <Card.Body>
                 <Card.Title>Share with friends</Card.Title>

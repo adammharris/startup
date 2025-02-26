@@ -1,19 +1,17 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-
-import './App.css'
-
-import Navigation from './navigation/navigation'
-import Home from './home/home';
-import Login from './login/login';
-import Blog from './blog/blog';
-import About from './about/about';
-import Help from './help/help';
-import Footer from './navigation/footer';
+import './App.css';
+import Navigation from './navigation/Navigation';
+import Home from './home/Home';
+import Login from './login/Login';
+import Blog from './blog/Blog';
+import About from './about/About';
+import Help from './help/Help';
+import Footer from './navigation/Footer';
 
 function NotFound() {
   return (
-    <main className="container-fluid bg-secondary text-center m-5 p-5">
+    <main className="container-fluid text-center m-5 p-5">
       404: Return to sender. Address unknown.
     </main>
   );
@@ -22,10 +20,9 @@ function NotFound() {
 function App() {
   return (
     <BrowserRouter>
-    <h1>Hello</h1>
-      <div className="App">
+      <div className="App d-flex flex-column min-vh-100 mt-4 pb-5 bg-primary">
         <Navigation />
-        <div className="body bg-secondary">
+        <div className="body flex-grow-1 pt-5">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />

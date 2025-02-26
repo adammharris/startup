@@ -2,10 +2,11 @@
 //import './help.css'
 import { Accordion, AccordionBody, AccordionHeader, AccordionItem } from 'react-bootstrap';
 import Card from 'react-bootstrap/Card'
+import Container from 'react-bootstrap/Container';
 
 function Help() {
   return (
-    <main className="body bg-secondary text-dark p-5 m-5">
+    <Container className="text-dark p-5" style={{ maxWidth: '800px' }}>
       <Card className="p-4">
         <h1>Help</h1>
         <hr/>
@@ -29,7 +30,7 @@ function Help() {
             </AccordionItem>
         </Accordion>
         </Card>
-    </main>
+    </Container>
   );
 }
 

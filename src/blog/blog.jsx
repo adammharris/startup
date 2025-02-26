@@ -4,7 +4,7 @@ import Card from 'react-bootstrap/Card'
 
 function Blog() {
   return (
-    <main className="body bg-secondary text-dark p-5">
+    <main className="text-dark p-5">
         <Card className="p-5 m-5">
             <h1>Blog</h1>
             <hr/>
