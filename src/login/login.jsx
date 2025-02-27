@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import { useNavigate } from 'react-router-dom';
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card'
@@ -7,18 +8,21 @@ import bcrypt from 'bcryptjs';
 
 
 export function Login() {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
     async function submitContent(e) {
         e.preventDefault();
-        localStorage.setItem('email', email);
-        console.log('Email: ', email);
+        localStorage.setItem('username', username);
+        console.log('Username: ', username);
 
         const salt = bcrypt.genSaltSync(10);
         const hash = bcrypt.hashSync(password, salt);
         localStorage.setItem('password', hash);
         console.log('Password: ', hash);
+
+        navigate('/dashboard');
     }
 
     return (
@@ -28,12 +32,11 @@ export function Login() {
                 <h1>Login</h1>
                 <hr/>
                 <Form.Group className="mb-3" controlID="formBasicEmail">
-                    <Form.Label>Email</Form.Label>
+                    <Form.Label>Username</Form.Label>
                     <Form.Control 
-                        type="email"
-                        placeholder="your@email.com" 
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
+                        placeholder="Username" 
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
                         required
                     />
                 </Form.Group>

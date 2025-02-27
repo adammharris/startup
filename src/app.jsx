@@ -8,6 +8,7 @@ import Blog from './blog/Blog';
 import About from './about/About';
 import Help from './help/Help';
 import Footer from './navigation/Footer';
+import Dashboard from './dashboard/Dashboard';
 
 function NotFound() {
   return (
@@ -20,7 +21,7 @@ function NotFound() {
 function App() {
   return (
     <BrowserRouter>
-      <div className="App d-flex flex-column min-vh-100 mt-4 pb-5 bg-primary">
+      <div className="App d-flex flex-column min-vh-100 pt-4 pb-5 bg-primary">
         <Navigation />
         <div className="body flex-grow-1 pt-5">
           <Routes>
@@ -30,6 +31,7 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/help" element={<Help />} />
             <Route path="*" element={<NotFound />} />
+            <Route path="/dashboard" element={<Dashboard />} />
           </Routes>
         </div>
         <Footer />
