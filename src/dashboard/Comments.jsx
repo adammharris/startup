@@ -1,13 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import Accordion from 'react-bootstrap/Accordion';
 import Comment from './Comment';
 
-export default function Comments() {
+export default function Comments({ accordionKey = "0" }) {
     const [comments, setComments] = useState([
-        { username: "testuser3", id: 3, text: "Third comment" },
-        { username: "testuser2", id: 2, text: "Second comment" },
-        { username: "testuser1", id: 1, text: "First comment" }
+        { username: "testuser1", id: 1, text: "Here is a test comment!" }
     ]);
 
     const [newComment, setNewComment] = useState('');
@@ -28,7 +27,7 @@ export default function Comments() {
         
         // Add new comment to the list with a unique ID
         const newCommentObj = {
-            username: localStorage.getItem('username'),
+            username: localStorage.getItem('username') || "Anonymous",
             id: Date.now(),
             text: newComment
         };
@@ -40,50 +39,54 @@ export default function Comments() {
     };
 
     return (
-        <div className="mt-0">
-            {/* Comment section header */}
-            <div className="bg-light border-top border-bottom py-2 px-3">
-                <small className="text-muted">Comments</small>
-            </div>
-            
-            {/* Scrollable comments area */}
-            <div 
-                ref={commentsContainerRef}
-                style={{ 
-                    maxHeight: '120px', 
-                    overflowY: 'auto',
-                }}
-            >
-                {comments.map(comment => (
-                    <Comment 
-                        username={comment.username} 
-                        id={comment.id} 
-                        key={comment.id}
-                        text={comment.text} 
-                    />
-                ))}
-            </div>
-            
-            {/* Comment input form */}
-            <div className="border-top p-2">
-                <Form onSubmit={handleSubmit} className="d-flex">
-                    <Form.Control 
-                        size="sm"
-                        placeholder="Write a comment..." 
-                        value={newComment}
-                        onChange={e => setNewComment(e.target.value)}
-                        required
-                        className="me-2"
-                    />
-                    <Button 
-                        variant="outline-primary" 
-                        type="submit"
-                        size="sm"
-                    >
-                        Post
-                    </Button>
-                </Form>
-            </div>
-        </div>
+        <Accordion defaultActiveKey="">
+            <Accordion.Item eventKey={accordionKey}>
+                <Accordion.Header>
+                    <small>{comments.length > 0 ? `Comments (${comments.length})` : "Comments"}</small>
+                </Accordion.Header>
+                <Accordion.Body className="p-0">
+                    <div className="mt-0">
+                        {/* Scrollable comments area */}
+                        <div 
+                            ref={commentsContainerRef}
+                            style={{ 
+                                maxHeight: '120px', 
+                                overflowY: 'auto',
+                            }}
+                        >
+                            {comments.map(comment => (
+                                <Comment 
+                                    username={comment.username} 
+                                    id={comment.id} 
+                                    key={comment.id}
+                                    text={comment.text} 
+                                />
+                            ))}
+                        </div>
+                        
+                        {/* Comment input form */}
+                        <div className="border-top p-2">
+                            <Form onSubmit={handleSubmit} className="d-flex">
+                                <Form.Control 
+                                    size="sm"
+                                    placeholder="Write a comment..." 
+                                    value={newComment}
+                                    onChange={e => setNewComment(e.target.value)}
+                                    required
+                                    className="me-2"
+                                />
+                                <Button 
+                                    variant="outline-primary" 
+                                    type="submit"
+                                    size="sm"
+                                >
+                                    Post
+                                </Button>
+                            </Form>
+                        </div>
+                    </div>
+                </Accordion.Body>
+            </Accordion.Item>
+        </Accordion>
     );
 }
