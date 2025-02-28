@@ -1,14 +1,29 @@
 import { useState } from 'react';
-import Card from 'react-bootstrap/Card'
-import { Button } from 'react-bootstrap';
+import Card from 'react-bootstrap/Card';
+import Button from 'react-bootstrap/Button';
 import Comments from './Comments';
 import Stack from 'react-bootstrap/Stack';
 import Modal from 'react-bootstrap/Modal';
+import DOMPurify from 'dompurify';
 
 export default function Article({article}) {
     const getPreviewText = (content) => {
-        if (content.length <= 100) return content;
-        return content.substring(0, 100) + '...';
+        // Create a temporary element to render the HTML content
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = content;
+        
+        // Get plain text from HTML
+        const plainText = tempDiv.textContent || tempDiv.innerText || "";
+        
+        if (plainText.length <= 100) return plainText;
+        return plainText.substring(0, 100) + '...';
+    };
+
+    const sanitizeHTML = (html) => {
+        return DOMPurify.sanitize(html, {
+            ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p', 'br', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'a'],
+            ALLOWED_ATTR: ['href', 'target']
+        });
     };
 
     const [expanded, setExpanded] = useState(false);
@@ -22,14 +37,13 @@ export default function Article({article}) {
         <Card className="h-100">
             <Card.Header>{article.title}</Card.Header>
             <Card.Body>
-                <Card.Text>
-                    {(expanded || article.content.length <= 100)
-                        ? article.content 
-                        : getPreviewText(article.content
-                    )}
-                </Card.Text>
-
-                
+                {expanded || article.content.length <= 100 ? (
+                    <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(article.content) }} />
+                ) : (
+                    <Card.Text>
+                        {getPreviewText(article.content)}
+                    </Card.Text>
+                )}
             </Card.Body>
             <Card.Footer className="text-muted">
                 <Stack direction="horizontal">
@@ -54,18 +68,18 @@ export default function Article({article}) {
 
             {showModal && (
                 <Modal
-                    show={() => setShowModal(true)}
+                    show={showModal}
                     onHide={() => setShowModal(false)}
                     size="lg"
                     centered
                 >
-                    <Modal.Header>
+                    <Modal.Header closeButton>
                         <Modal.Title>
                             {article.title}
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <p>{article.content}</p>
+                        <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(article.content) }} />
                     </Modal.Body>
                     <Modal.Footer>
                         <Stack direction="horizontal" className="w-100" gap={3}>
@@ -74,7 +88,6 @@ export default function Article({article}) {
                                 Close
                             </Button>
                         </Stack>
-
                     </Modal.Footer>
                 </Modal>
             )}

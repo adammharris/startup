@@ -9,7 +9,7 @@ import About from './about/About';
 import Help from './help/Help';
 import Footer from './navigation/Footer';
 import Dashboard from './dashboard/Dashboard';
-import ArticleEditor from './editor/ArticleEditor';
+import Editor from './editor/Editor';
 
 function NotFound() {
   return (
@@ -33,7 +33,7 @@ function App() {
             <Route path="/help" element={<Help />} />
             <Route path="*" element={<NotFound />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/new-article" element={<ArticleEditor />} />
+            <Route path="/editor" element={<Editor />} />
           </Routes>
         </div>
         <Footer />
