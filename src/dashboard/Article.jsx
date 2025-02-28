@@ -163,31 +163,29 @@ export default function Article({ article, onDelete }) {
                 <Modal.Footer>
                     <Stack direction="horizontal" className="w-100" gap={3}>
                         <Comments accordionKey={`comments-${article.id}`}/>
-                        <Stack className="ms-auto" gap={3}>
-                            <Button 
-                                variant="outline-danger" 
-                                onClick={() => setShowDeleteConfirm(true)}
-                                className="me-2"
-                            >
-                                Delete Article
-                            </Button>
-                            <Button 
-                                variant="outline-primary" 
-                                onClick={() => {
-                                    setShowModal(false);
-                                    navigate(`/editor/${article.id}`);
-                                }}
-                                className="me-2"
-                            >
-                                Edit
-                            </Button>
-                            <Button 
-                                variant="secondary"
-                                onClick={() => setShowModal(false)}
-                            >
-                                Close
-                            </Button>
-                        </Stack>
+                        <Button 
+                            variant="outline-danger" 
+                            onClick={() => setShowDeleteConfirm(true)}
+                            className="me-2"
+                        >
+                            Delete Article
+                        </Button>
+                        <Button 
+                            variant="outline-primary" 
+                            onClick={() => {
+                                setShowModal(false);
+                                navigate(`/editor/${article.id}`);
+                            }}
+                            className="me-2"
+                        >
+                            Edit
+                        </Button>
+                        <Button 
+                            variant="secondary"
+                            onClick={() => setShowModal(false)}
+                        >
+                            Close
+                        </Button>
                     </Stack>
                 </Modal.Footer>
             </Modal>
