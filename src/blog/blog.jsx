@@ -1,5 +1,3 @@
-//import React from 'react';
-//import './blog.css'
 import Card from 'react-bootstrap/Card'
 
 function Blog() {

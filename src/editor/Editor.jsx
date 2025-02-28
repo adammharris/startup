@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import Badge from 'react-bootstrap/Badge';
 import { useNavigate } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import PlainQuillEditor from './PlainQuillEditor';
@@ -9,6 +10,8 @@ import PlainQuillEditor from './PlainQuillEditor';
 export default function Editor({ article = {}, onSave, onCancel }) {
   const [title, setTitle] = useState(article.title || '');
   const [content, setContent] = useState(article.content || '');
+  const [tagInput, setTagInput] = useState('');
+  const [tags, setTags] = useState(article.tags || []);
   const navigate = useNavigate();
 
   const handleSave = (savedArticle) => {
@@ -45,6 +48,7 @@ export default function Editor({ article = {}, onSave, onCancel }) {
       ...article,
       title,
       content,
+      tags,
       date: new Date().toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short', 
@@ -52,6 +56,21 @@ export default function Editor({ article = {}, onSave, onCancel }) {
       })
     };
     handleSave(newArticle);
+  };
+  
+  const handleAddTag = (e) => {
+    e.preventDefault();
+    if (tagInput.trim()) {
+      // Avoid adding duplicate tags
+      if (!tags.includes(tagInput.trim())) {
+        setTags([...tags, tagInput.trim()]);
+      }
+      setTagInput('');
+    }
+  };
+  
+  const handleRemoveTag = (tagToRemove) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
   };
   
   return (
@@ -81,6 +100,44 @@ export default function Editor({ article = {}, onSave, onCancel }) {
                   onChange={setContent}
                 />
               </div>
+            </Form.Group>
+            
+            <Form.Group className="mb-3">
+              <Form.Label>Tags</Form.Label>
+              <div className="d-flex">
+                <Form.Control
+                  type="text"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  placeholder="Add tags..."
+                  className="me-2"
+                />
+                <Button 
+                  variant="outline-primary" 
+                  onClick={handleAddTag}
+                  type="button"
+                >
+                  Add Tag
+                </Button>
+              </div>
+              
+              <div className="mt-2">
+                {tags.map((tag, index) => (
+                  <Badge 
+                    bg="primary" 
+                    key={index} 
+                    className="me-1 mb-1 p-2"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => handleRemoveTag(tag)}
+                  >
+                    {tag} &times;
+                  </Badge>
+                ))}
+                {tags.length === 0 && (
+                  <small className="text-muted">No tags added yet</small>
+                )}
+              </div>
+              <small className="text-muted">Click on a tag to remove it</small>
             </Form.Group>
             
             <div className="d-flex justify-content-end gap-2 mt-4">

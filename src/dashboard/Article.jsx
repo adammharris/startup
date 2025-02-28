@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
+import Badge from 'react-bootstrap/Badge';
 import Comments from './Comments';
 import Stack from 'react-bootstrap/Stack';
 import Modal from 'react-bootstrap/Modal';
@@ -35,7 +36,10 @@ export default function Article({article}) {
 
     return (
         <Card className="h-100">
-            <Card.Header>{article.title}</Card.Header>
+            <Card.Header className="d-flex justify-content-between align-items-center">
+                <div>{article.title}</div>
+                <small className="text-muted">{article.date}</small>
+            </Card.Header>
             <Card.Body>
                 {expanded || article.content.length <= 100 ? (
                     <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(article.content) }} />
@@ -43,6 +47,16 @@ export default function Article({article}) {
                     <Card.Text>
                         {getPreviewText(article.content)}
                     </Card.Text>
+                )}
+                
+                {article.tags && article.tags.length > 0 && (
+                    <div className="mt-3">
+                        {article.tags.map((tag, index) => (
+                            <Badge bg="secondary" key={index} className="me-1">
+                                {tag}
+                            </Badge>
+                        ))}
+                    </div>
                 )}
             </Card.Body>
             <Card.Footer className="text-muted">
@@ -80,6 +94,16 @@ export default function Article({article}) {
                     </Modal.Header>
                     <Modal.Body>
                         <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(article.content) }} />
+                        
+                        {article.tags && article.tags.length > 0 && (
+                            <div className="mt-3">
+                                {article.tags.map((tag, index) => (
+                                    <Badge bg="secondary" key={index} className="me-1">
+                                        {tag}
+                                    </Badge>
+                                ))}
+                            </div>
+                        )}
                     </Modal.Body>
                     <Modal.Footer>
                         <Stack direction="horizontal" className="w-100" gap={3}>

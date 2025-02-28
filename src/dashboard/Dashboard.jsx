@@ -10,9 +10,9 @@ function Dashboard() {
     const username = localStorage.getItem('username') || "Guest";
     const navigate = useNavigate();
 
-    // Sample articles data (in a real app, this would come from an API or state)
     const [articles, setArticles] = useState(() => {
         try {
+            // Get articles (later, get from backend)
             const savedArticles = localStorage.getItem('articles');
             return savedArticles ? JSON.parse(savedArticles) : [];
         } catch (error) {
@@ -22,6 +22,7 @@ function Dashboard() {
     });
 
     // Update localStorage whenever articles state changes
+    // Later, use Websockets or something
     useEffect(() => {
         try {
             localStorage.setItem('articles', JSON.stringify(articles));
@@ -76,7 +77,7 @@ function Dashboard() {
                                 </Col>
                             ))}
                         </Row>
-                    ) : (
+                    ) : ( // If there are no articles
                         <Card className="mb-4 p-3 text-center">
                             <p>No articles yet. Click "New Entry" to create your first article!</p>
                         </Card>
