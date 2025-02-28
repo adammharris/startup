@@ -39,7 +39,7 @@ export default function Comments({ accordionKey = "0" }) {
     };
 
     return (
-        <Accordion defaultActiveKey="">
+        <Accordion defaultActiveKey="" className="w-100">
             <Accordion.Item eventKey={accordionKey}>
                 <Accordion.Header>
                     <small>{comments.length > 0 ? `Comments (${comments.length})` : "Comments"}</small>
