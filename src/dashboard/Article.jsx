@@ -36,15 +36,18 @@ export default function Article({article}) {
 
     return (
         <Card className="h-100">
-            <Card.Header className="d-flex justify-content-between align-items-center">
+            <Card.Header className="d-flex justify-content-between align-items-center text-break">
                 <div>{article.title}</div>
-                <small className="text-muted">{article.date}</small>
+                <small className="text-muted text-break">{article.date}</small>
             </Card.Header>
             <Card.Body>
                 {expanded || article.content.length <= 100 ? (
-                    <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(article.content) }} />
+                    <div 
+                        dangerouslySetInnerHTML={{ __html: sanitizeHTML(article.content) }} 
+                        className='text-break'
+                    />
                 ) : (
-                    <Card.Text>
+                    <Card.Text className='text-break'>
                         {getPreviewText(article.content)}
                     </Card.Text>
                 )}
@@ -52,7 +55,17 @@ export default function Article({article}) {
                 {article.tags && article.tags.length > 0 && (
                     <div className="mt-3">
                         {article.tags.map((tag, index) => (
-                            <Badge bg="secondary" key={index} className="me-1">
+                            <Badge 
+                                bg="secondary" 
+                                key={index} 
+                                className="me-1 text-break"
+                                style={{ 
+                                    maxWidth: '100%',
+                                    overflow: 'hidden',
+                                    whiteSpace: 'normal',
+                                    wordBreak: 'break-word'
+                                }}
+                            >
                                 {tag}
                             </Badge>
                         ))}
@@ -88,17 +101,27 @@ export default function Article({article}) {
                     centered
                 >
                     <Modal.Header closeButton>
-                        <Modal.Title>
+                        <Modal.Title className='text-break'>
                             {article.title}
                         </Modal.Title>
                     </Modal.Header>
-                    <Modal.Body>
+                    <Modal.Body className='text-break'>
                         <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(article.content) }} />
                         
                         {article.tags && article.tags.length > 0 && (
                             <div className="mt-3">
                                 {article.tags.map((tag, index) => (
-                                    <Badge bg="secondary" key={index} className="me-1">
+                                    <Badge 
+                                        bg="secondary" 
+                                        key={index} 
+                                        className="me-1"
+                                        style={{ 
+                                            maxWidth: '100%',
+                                            overflow: 'hidden',
+                                            whiteSpace: 'normal',
+                                            wordBreak: 'break-word'
+                                        }}
+                                    >
                                         {tag}
                                     </Badge>
                                 ))}

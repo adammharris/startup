@@ -12,7 +12,11 @@ export default function Editor({ article = {}, onSave, onCancel }) {
   const [content, setContent] = useState(article.content || '');
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState(article.tags || []);
+  const [tagError, setTagError] = useState('');
   const navigate = useNavigate();
+  
+  // Constants
+  const MAX_TAG_LENGTH = 30;
 
   const handleSave = (savedArticle) => {
     // For real app: Save to API
@@ -58,19 +62,50 @@ export default function Editor({ article = {}, onSave, onCancel }) {
     handleSave(newArticle);
   };
   
+  const handleTagInputChange = (e) => {
+    const input = e.target.value;
+    setTagInput(input);
+    
+    // Clear error when input changes
+    if (tagError) setTagError('');
+    
+    // Show error if over character limit
+    if (input.length > MAX_TAG_LENGTH) {
+      setTagError(`Tag must be ${MAX_TAG_LENGTH} characters or less`);
+    }
+  };
+  
   const handleAddTag = (e) => {
     e.preventDefault();
-    if (tagInput.trim()) {
-      // Avoid adding duplicate tags
-      if (!tags.includes(tagInput.trim())) {
-        setTags([...tags, tagInput.trim()]);
-      }
-      setTagInput('');
+    
+    if (!tagInput.trim()) return;
+    
+    if (tagInput.length > MAX_TAG_LENGTH) {
+      setTagError(`Tag must be ${MAX_TAG_LENGTH} characters or less`);
+      return;
     }
+    
+    if (tags.includes(tagInput.trim())) {
+      setTagError('This tag already exists');
+      return;
+    }
+
+    // Add tag
+    setTags([...tags, tagInput.trim()]);
+    setTagInput('');
+    setTagError('');
   };
   
   const handleRemoveTag = (tagToRemove) => {
     setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+  
+  // Handle Enter key in tag input
+  const handleTagKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddTag(e);
+    }
   };
   
   return (
@@ -108,18 +143,27 @@ export default function Editor({ article = {}, onSave, onCancel }) {
                 <Form.Control
                   type="text"
                   value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
+                  onChange={handleTagInputChange}
+                  onKeyUp={handleTagKeyPress}
                   placeholder="Add tags..."
                   className="me-2"
+                  isInvalid={!!tagError}
                 />
                 <Button 
                   variant="outline-primary" 
                   onClick={handleAddTag}
                   type="button"
+                  disabled={!!tagError || !tagInput.trim()}
                 >
                   Add Tag
                 </Button>
               </div>
+              
+              {tagError && (
+                <Form.Text className="text-danger">
+                  {tagError}
+                </Form.Text>
+              )}
               
               <div className="mt-2">
                 {tags.map((tag, index) => (
@@ -127,7 +171,13 @@ export default function Editor({ article = {}, onSave, onCancel }) {
                     bg="primary" 
                     key={index} 
                     className="me-1 mb-1 p-2"
-                    style={{ cursor: 'pointer' }}
+                    style={{ 
+                      cursor: 'pointer',
+                      maxWidth: '100%',
+                      overflow: 'hidden',
+                      whiteSpace: 'normal',
+                      wordBreak: 'break-word'
+                    }}
                     onClick={() => handleRemoveTag(tag)}
                   >
                     {tag} &times;

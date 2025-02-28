@@ -17,7 +17,7 @@ function Help() {
                 Why doesn't this website work yet?
                 </Accordion.Header>
                 <AccordionBody>
-                Unfortunately, I have only made the HTML and CSS. Stay tuned for JavaScript, React, and Websocket.
+                Unfortunately, I have only made the HTML, CSS, and React. Stay tuned for a proper backend with Websocket.
                 </AccordionBody>
             </Accordion.Item>
             <AccordionItem eventKey="1">
