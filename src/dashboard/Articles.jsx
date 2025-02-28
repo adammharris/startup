@@ -4,7 +4,7 @@ import Article from './Article';
 export default function Articles({articles}) {
     return (
         <Row className="">
-            {articles && articles.length > 0 ? (
+            {!articles || articles.length > 0 ? (
                 <Row xs={1} md={2} className="g-4">
                     {articles.map(article => (
                         <Col key={article.id}>

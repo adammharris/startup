@@ -67,8 +67,23 @@ function Dashboard() {
                     <p>Coming soon!</p>
                 </Card>
             </Stack>
+            {!articles || articles.length == 0 ? (
+                <Card className="mt-4 p-4 text-center">
+                    <Card.Body>
+                        <h3>Welcome to ShowBrain!</h3>
+                        <p className="mt-3">You don't have any articles yet. Ready to write your first one?</p>
+                        <Button 
+                            variant="primary" 
+                            onClick={() => navigate('/editor')}
+                        >
+                            Create Your First Article
+                        </Button>
+                    </Card.Body>
+                </Card>
+            ) : (
+                <Articles articles={articles}  />
+            )}
             
-            <Articles articles={articles}  />
             
         </Container>
     );
