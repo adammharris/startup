@@ -119,8 +119,8 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **All functionality implemented or mocked out** - I did not complete this part of the deliverable.
-- [x] **Hooks** - I did not complete this part of the deliverable.
+- [x] **All functionality implemented or mocked out** - I implemented article writing, comment writing, and displaying articles in a Bootstrap grid. I implemented basic login functionality. Most importantly— tags! They can't actually filter articles without a backend, but they are easy to attach to articles!
+- [x] **Hooks** - Plenty of hooks for comments, articles, etc.
 
 ## 🚀 Service deliverable
 
