@@ -3,6 +3,7 @@
 import { Accordion, AccordionBody, AccordionHeader, AccordionItem } from 'react-bootstrap';
 import Card from 'react-bootstrap/Card'
 import Container from 'react-bootstrap/Container';
+import { NavLink } from 'react-router-dom';
 
 function Help() {
   return (
@@ -25,7 +26,7 @@ function Help() {
                 Why was ShowBrain made?
                 </AccordionHeader>
                 <AccordionBody>
-                See the <a href="about.html">about page</a>.
+                See the <NavLink to="/about">about page</NavLink>.
                 </AccordionBody>
             </AccordionItem>
         </Accordion>
