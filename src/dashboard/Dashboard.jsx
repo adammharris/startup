@@ -5,19 +5,11 @@ import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
 import { Row, Col } from 'react-bootstrap';
 import Article from './Article';
+import Modal from 'react-bootstrap/Modal';
 
 function Dashboard() {
     const username = localStorage.getItem('username')
     const navigate = useNavigate();
-
-    const [expandedArticles, setExpandedArticles] = useState({});
-
-    function toggleArticleExpand(id) {
-        setExpandedArticles(prev => ({
-            ...prev,
-            [id]: !prev[id]
-        }));
-    }
 
     // Sample articles data (in a real app, this would come from an API or state)
     const [articles] = useState([
@@ -51,15 +43,32 @@ function Dashboard() {
         }
     ]);
 
+    
+
     function logout() {
         localStorage.removeItem('username');
         localStorage.removeItem('password');
-        //window.location.reload();
         navigate('/');
     }
 
     return (
         <Container className="text-dark p-5" >
+            <Modal>
+                <Modal.Header>
+                    <Modal.Title>New Entry</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>Coming soon!</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary">
+                        Close
+                    </Button>
+                    <Button variant="primary">
+                        Save Entry
+                    </Button>
+                </Modal.Footer>
+            </Modal>
             <Row>
                 <Col>
                     <Card className="p-4">
@@ -67,7 +76,11 @@ function Dashboard() {
                         <hr/>
                         <p>Here is your ShowBrain page!</p>
                         <div className="d-flex justify-content-end">
-                            <Button variant="outline-primary" size="sm">
+                            <Button 
+                                variant="outline-primary" 
+                                size="sm"
+                                
+                            >
                                 + New Entry
                             </Button>
                         </div>
