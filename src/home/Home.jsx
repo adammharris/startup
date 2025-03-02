@@ -4,7 +4,6 @@ import Container from 'react-bootstrap/Container'
 import upload from './upload_journal.svg'
 import access from './access_levels.svg'
 import share from './share_with_friends.svg'
-import './Home.css'
 
 export function Home() {
   return (
