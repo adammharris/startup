@@ -1,15 +1,14 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import './App.css';
-import Navigation from './navigation/Navigation';
-import Home from './home/Home';
-import Login from './login/Login';
-import Blog from './blog/Blog';
-import About from './about/About';
-import Help from './help/Help';
-import Footer from './navigation/Footer';
-import Dashboard from './dashboard/Dashboard';
-import Editor from './editor/Editor';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import "./App.css";
+import Navigation from "./navigation/Navigation";
+import Home from "./home/Home";
+import Login from "./login/Login";
+import Blog from "./blog/Blog";
+import About from "./about/About";
+import Help from "./help/Help";
+import Footer from "./navigation/Footer";
+import Dashboard from "./dashboard/Dashboard";
+import Editor from "./editor/Editor";
 
 function NotFound() {
   return (

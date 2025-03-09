@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
-import Quill from 'quill';
-import 'quill/dist/quill.snow.css';
+import Quill from "quill";
+import "quill/dist/quill.snow.css";
+import { useEffect, useRef } from "react";
 
 function PlainQuillEditor({ value, onChange }) {
   const editorRef = useRef(null);
@@ -9,19 +9,19 @@ function PlainQuillEditor({ value, onChange }) {
   useEffect(() => {
     if (editorRef.current && !quillRef.current) {
       const quill = new Quill(editorRef.current, {
-        theme: 'snow',
+        theme: "snow",
         modules: {
           toolbar: [
-            [{ 'header': [1, 2, false] }],
-            ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-            [{'list': 'ordered'}, {'list': 'bullet'}],
-            ['link', 'image'],
-            ['clean']
+            [{ header: [1, 2, false] }],
+            ["bold", "italic", "underline", "strike", "blockquote"],
+            [{ list: "ordered" }, { list: "bullet" }],
+            ["link", "image"],
+            ["clean"],
           ],
-        }
+        },
       });
 
-      quill.on('text-change', () => {
+      quill.on("text-change", () => {
         const content = quill.root.innerHTML;
         onChange(content);
       });
@@ -39,7 +39,7 @@ function PlainQuillEditor({ value, onChange }) {
 
   return (
     <div>
-      <div ref={editorRef} style={{ height: '300px' }}></div>
+      <div ref={editorRef} style={{ height: "300px" }}></div>
     </div>
   );
 }

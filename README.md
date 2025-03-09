@@ -22,15 +22,15 @@ Do you ever have so much to say that you wish you could just… take your brain 
 
 Home page to become the admin of a new ShowBrain
 
-![Home page](media/design_images/showbrain_home.png)
+![Home page](design_images/showbrain_home.png)
 
 ShowBrain of Tom as viewed by a stranger
 
-![Stranger ShowBrain](media/design_images/showbrain_stranger.png)
+![Stranger ShowBrain](design_images/showbrain_stranger.png)
 
 ShowBrain of Tom as viewed by a friend
 
-![Friend ShowBrain](media/design_images/showbrain_friend.png)
+![Friend ShowBrain](design_images/showbrain_friend.png)
 
 Here is a rough sequence diagram that shows how ShowBrain works. It is essentially a social media/blogging application, but with a focus on small groups and personal utility rather than making lots of things known to the public.
 
