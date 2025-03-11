@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "bcryptjs": "^3.0.2",
     "bootstrap": "^5.3.3",
     "dompurify": "^3.2.4",
     "quill": "^2.0.3",

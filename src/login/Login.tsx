@@ -4,7 +4,6 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
-import bcrypt from "bcryptjs";
 
 export const Login: React.FC = () => {
   const [username, setUsername] = useState<string>("");
@@ -14,18 +13,12 @@ export const Login: React.FC = () => {
   async function submitContent(e: FormEvent, isLogin: boolean): Promise<void> {
     console.log("submitContent! isLogin: ", isLogin);
     e.preventDefault();
-    //localStorage.setItem('username', username);
-    //console.log('Username: ', username);
-    const salt = bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync(password, salt);
-    //localStorage.setItem('password', hash);
-    //console.log('Password: ', hash);
     const response = await fetch("/api/auth", {
       method: isLogin ? "PUT" : "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ username, password: hash }),
+      body: JSON.stringify({ username, password: password }),
     });
     
     if (response.ok) {

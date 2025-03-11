@@ -1,12 +1,16 @@
 const express = require("express");
+const bcrypt = require("bcryptjs");
 const app = express();
 app.use(express.json());
 
 users = [];
-async function createUser(username, passwordHash) {
+
+async function createUser(username, password) {
+  const salt = await bcrypt.genSalt(10);
+  const passwordHash = await bcrypt.hash(password, salt);
   const user = {
     username: username,
-    password: passwordHash,
+    passwordHash: passwordHash,
   };
 
   users.push(user);
