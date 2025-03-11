@@ -6,11 +6,18 @@ import Container from "react-bootstrap/Container";
 import { useNavigate } from "react-router-dom";
 import Articles from "./Articles";
 
-function Dashboard() {
+interface Article {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  // Add other properties as needed
+}
+
+const Dashboard: React.FC = () => {
   const username = localStorage.getItem("username") || "Guest";
   const navigate = useNavigate();
-
-  const [articles, setArticles] = useState(() => {
+  const [articles, setArticles] = useState<Article[]>(() => {
     try {
       // Get articles (later, get from backend)
       const savedArticles = localStorage.getItem("articles");
@@ -20,7 +27,7 @@ function Dashboard() {
       return [];
     }
   });
-
+  
   // Update localStorage whenever articles state changes
   // Later, use Websockets or something
   useEffect(() => {
@@ -30,13 +37,13 @@ function Dashboard() {
       console.error("Error saving articles to localStorage:", error);
     }
   }, [articles]);
-
-  function logout() {
+  
+  const logout = (): void => {
     localStorage.removeItem("username");
     localStorage.removeItem("password");
     navigate("/");
-  }
-
+  };
+  
   return (
     <Container className="text-dark p-5">
       <Card className="p-4">
@@ -53,7 +60,6 @@ function Dashboard() {
           </Button>
         </div>
       </Card>
-
       <Stack direction="horizontal" gap={3}>
         <Card className="p-3">
           <h2>My Account</h2>
@@ -67,10 +73,9 @@ function Dashboard() {
           <p>Coming soon!</p>
         </Card>
       </Stack>
-
       <Articles articles={articles} />
     </Container>
   );
-}
+};
 
 export default Dashboard;

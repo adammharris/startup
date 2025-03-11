@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
@@ -6,22 +6,20 @@ import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
 import bcrypt from "bcryptjs";
 
-export function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+export const Login: React.FC = () => {
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const navigate = useNavigate();
 
-  async function submitContent(e, isLogin) {
+  async function submitContent(e: FormEvent, isLogin: boolean): Promise<void> {
     console.log("submitContent! isLogin: ", isLogin);
     e.preventDefault();
     //localStorage.setItem('username', username);
     //console.log('Username: ', username);
-
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(password, salt);
     //localStorage.setItem('password', hash);
     //console.log('Password: ', hash);
-
     const response = await fetch("/api/auth", {
       method: isLogin ? "PUT" : "POST",
       headers: {
@@ -29,7 +27,7 @@ export function Login() {
       },
       body: JSON.stringify({ username, password: hash }),
     });
-
+    
     if (response.ok) {
       navigate("/dashboard");
     } else {
@@ -73,5 +71,6 @@ export function Login() {
       </Card>
     </Container>
   );
-}
+};
+
 export default Login;

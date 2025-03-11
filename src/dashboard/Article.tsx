@@ -7,33 +7,42 @@ import Stack from "react-bootstrap/Stack";
 import Modal from "react-bootstrap/Modal";
 import DOMPurify from "dompurify";
 import { useNavigate } from "react-router-dom";
-import PropTypes from "prop-types";
 
-export default function Article({ article, onDelete }) {
+interface ArticleType {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  tags?: string[];
+}
+
+interface ArticleProps {
+  article: ArticleType;
+  onDelete?: (id: string) => void;
+}
+
+const Article: React.FC<ArticleProps> = ({ article, onDelete }) => {
   const navigate = useNavigate();
-  const [expanded, setExpanded] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [expanded, setExpanded] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<boolean>(false);
 
-  const getPreviewText = (content) => {
+  const getPreviewText = (content: string): string => {
     // Create a temporary element to render the HTML content
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = content;
-
     // Get plain text from HTML
     const plainText = tempDiv.textContent || tempDiv.innerText || "";
-
     if (plainText.length <= 100) return plainText;
     return plainText.substring(0, 100) + "...";
   };
 
-  const sanitizeHTML = (html) => {
+  const sanitizeHTML = (html: string): string => {
     // Step 1: Remove all images with non-data URLs using a regex
     const imagesFiltered = html.replace(
       /<img[^>]+src\s*=\s*["'](?!data:)[^"'>]+["'][^>]*>/gi,
       "",
     );
-
     // Step 2: Sanitize using DOMPurify
     return DOMPurify.sanitize(imagesFiltered, {
       ALLOWED_TAGS: [
@@ -64,23 +73,21 @@ export default function Article({ article, onDelete }) {
     });
   };
 
-  const toggleExpanded = () => {
+  const toggleExpanded = (): void => {
     setExpanded(!expanded);
   };
 
-  const handleDelete = () => {
+  const handleDelete = (): void => {
     // Update localStorage
     try {
       const savedArticles = JSON.parse(
-        localStorage.getItem("articles") || "[]",
+        localStorage.getItem("articles") || "[]"
       );
-      const updatedArticles = savedArticles.filter((a) => a.id !== article.id);
+      const updatedArticles = savedArticles.filter((a: ArticleType) => a.id !== article.id);
       localStorage.setItem("articles", JSON.stringify(updatedArticles));
-
       // Close modals
       setShowDeleteConfirm(false);
       setShowModal(false);
-
       // Notify parent component to update the articles list
       if (onDelete) {
         onDelete(article.id);
@@ -111,7 +118,6 @@ export default function Article({ article, onDelete }) {
             {getPreviewText(article.content)}
           </Card.Text>
         )}
-
         {article.tags && article.tags.length > 0 && (
           <div className="mt-3">
             {article.tags.map((tag, index) => (
@@ -168,7 +174,6 @@ export default function Article({ article, onDelete }) {
           <div
             dangerouslySetInnerHTML={{ __html: sanitizeHTML(article.content) }}
           />
-
           {article.tags && article.tags.length > 0 && (
             <div className="mt-3">
               {article.tags.map((tag, index) => (
@@ -244,15 +249,6 @@ export default function Article({ article, onDelete }) {
       </Modal>
     </Card>
   );
-}
-
-Article.propTypes = {
-  article: PropTypes.shape({
-    title: PropTypes.string.isRequired,
-    content: PropTypes.string.isRequired,
-    id: PropTypes.number.isRequired,
-    date: PropTypes.string.isRequired,
-    tags: PropTypes.arrayOf(PropTypes.string),
-  }).isRequired,
-  onDelete: PropTypes.func,
 };
+
+export default Article;

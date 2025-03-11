@@ -5,7 +5,7 @@ import access from "./access_levels.svg";
 import share from "./share_with_friends.svg";
 import upload from "./upload_journal.svg";
 
-export function Home() {
+export const Home: React.FC = () => {
   return (
     <Container fluid style={{ maxWidth: "800px" }}>
       <Card className="p-5 m-4">
@@ -17,7 +17,6 @@ export function Home() {
           <p>A simple, minimal, blog-like space for sharing your thoughts.</p>
         </Card.Body>
       </Card>
-
       <CardGroup className="d-flex flex-column flex-sm-row justify-content-center">
         <Card className="card-responsive">
           <Card.Img variant="top" src={upload} fluid />
@@ -53,6 +52,6 @@ export function Home() {
       </CardGroup>
     </Container>
   );
-}
+};
 
 export default Home;

@@ -1,4 +1,10 @@
-export default function Comment({ username, id, text }) {
+interface CommentProps {
+  username: string;
+  id: number;
+  text: string;
+}
+
+const Comment: React.FC<CommentProps> = ({ username, id, text }) => {
   return (
     <div className="border-bottom p-2">
       <div className="d-flex justify-content-between align-items-center mb-1">
@@ -9,3 +15,5 @@ export default function Comment({ username, id, text }) {
     </div>
   );
 }
+
+export default Comment;

@@ -2,8 +2,16 @@ import Card from 'react-bootstrap/Card'
 import Articles from '../dashboard/Articles';
 import { useState } from 'react';
 
-function Blog() {
-  const [articles, setArticles] = useState(() => {
+interface Article {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  // Add other properties as needed
+}
+
+const Blog: React.FC = () => {
+  const [articles, setArticles] = useState<Article[]>(() => {
         try {
             // Get articles (later, get from backend)
             const savedArticles = localStorage.getItem('articles');
@@ -13,7 +21,6 @@ function Blog() {
             return [];
         }
     });
-
   return (
     <main className="text-dark p-5">
         <Card className="p-5 m-5">
@@ -28,4 +35,4 @@ function Blog() {
   );
 }
 
-export default Blog
+export default Blog;

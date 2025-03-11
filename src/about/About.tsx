@@ -1,7 +1,7 @@
 import Card from 'react-bootstrap/Card'
 import Container from 'react-bootstrap/Container'
 
-function About() {
+const About: React.FC = () => {
   return (
     <Container fluid>
         <Card className='m-5 p-4 mx-auto' style={{ maxWidth: '800px' }}>
@@ -21,7 +21,6 @@ function About() {
             <p>
                 — "The Impact of Social Media Algorithms on Public Opinion," by Carl Williams, <a href="https://www.techtimes.com/articles/307600/20240923/impact-social-media-algorithms-public-opinion.htm">TechTimes</a>
             </p>
-
             <p>
                 Our lives, our families, even our very government— none seem to be able to escape the vast influence of popular social media algorithms.
             </p>
@@ -46,4 +45,4 @@ function About() {
   );
 }
 
-export default About
+export default About;

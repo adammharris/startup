@@ -4,13 +4,22 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Comment from "./Comment";
 
-export default function Comments({ accordionKey = "0" }) {
-  const [comments, setComments] = useState([
+interface CommentType {
+  username: string;
+  id: number;
+  text: string;
+}
+
+interface CommentsProps {
+  accordionKey?: string;
+}
+
+const Comments: React.FC<CommentsProps> = ({ accordionKey = "0" }) => {
+  const [comments, setComments] = useState<CommentType[]>([
     { username: "testuser1", id: 1, text: "Here is a test comment!" },
   ]);
-
-  const [newComment, setNewComment] = useState("");
-  const commentsContainerRef = useRef(null);
+  const [newComment, setNewComment] = useState<string>("");
+  const commentsContainerRef = useRef<HTMLDivElement | null>(null);
 
   // This useEffect will run whenever the comments array changes
   useEffect(() => {
@@ -20,13 +29,12 @@ export default function Comments({ accordionKey = "0" }) {
     }
   }, [comments]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-
     if (!newComment.trim()) return;
 
     // Add new comment to the list with a unique ID
-    const newCommentObj = {
+    const newCommentObj: CommentType = {
       username: localStorage.getItem("username") || "Anonymous",
       id: Date.now(),
       text: newComment,
@@ -87,4 +95,6 @@ export default function Comments({ accordionKey = "0" }) {
       </Accordion.Item>
     </Accordion>
   );
-}
+};
+
+export default Comments;

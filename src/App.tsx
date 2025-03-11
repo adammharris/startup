@@ -10,15 +10,15 @@ import Footer from "./navigation/Footer";
 import Dashboard from "./dashboard/Dashboard";
 import Editor from "./editor/Editor";
 
-function NotFound() {
+const NotFound: React.FC = () => {
   return (
     <main className="container-fluid text-center m-5 p-5">
       404: Return to sender. Address unknown.
     </main>
   );
-}
+};
 
-function App() {
+const App: React.FC = () => {
   return (
     <BrowserRouter>
       <div className="App d-flex flex-column min-vh-100 pt-4 pb-5 bg-primary">
@@ -39,6 +39,6 @@ function App() {
       </div>
     </BrowserRouter>
   );
-}
+};
 
 export default App;

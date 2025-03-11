@@ -8,7 +8,7 @@ import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
 import { NavLink } from "react-router-dom";
 
-function Help() {
+const Help: React.FC = () => {
   return (
     <Container className="text-dark p-5" style={{ maxWidth: "800px" }}>
       <Card className="p-4">
@@ -35,6 +35,6 @@ function Help() {
       </Card>
     </Container>
   );
-}
+};
 
 export default Help;

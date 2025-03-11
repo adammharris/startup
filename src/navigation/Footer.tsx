@@ -1,6 +1,6 @@
 import { Container } from "react-bootstrap";
 
-function Footer() {
+const Footer: React.FC = () => {
   return (
     <footer className="bg-dark text-white-50 fixed-bottom">
       <Container>

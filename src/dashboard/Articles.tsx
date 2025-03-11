@@ -6,14 +6,26 @@ import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import { useNavigate } from "react-router-dom";
 
-export default function Articles({ articles: initialArticles }) {
-  const [articles, setArticles] = useState(initialArticles);
-  const navigate = useNavigate();
+interface ArticleType {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  // Add other properties as needed
+}
 
-  const handleDeleteArticle = (articleId) => {
+interface ArticlesProps {
+  articles: ArticleType[];
+}
+
+const Articles: React.FC<ArticlesProps> = ({ articles: initialArticles }) => {
+  const [articles, setArticles] = useState<ArticleType[]>(initialArticles);
+  const navigate = useNavigate();
+  
+  const handleDeleteArticle = (articleId: string): void => {
     setArticles(articles.filter((article) => article.id !== articleId));
   };
-
+  
   // Check if there are no articles to display
   if (!articles || articles.length === 0) {
     return (
@@ -30,7 +42,7 @@ export default function Articles({ articles: initialArticles }) {
       </Card>
     );
   }
-
+  
   // If there are articles, display them in a grid
   return (
     <Row xs={1} md={2} className="g-4 mt-2">
@@ -41,4 +53,6 @@ export default function Articles({ articles: initialArticles }) {
       ))}
     </Row>
   );
-}
+};
+
+export default Articles;

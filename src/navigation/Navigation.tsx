@@ -4,14 +4,14 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { NavLink, useLocation } from 'react-router-dom'
 
-function Navigation() {
+const Navigation: React.FC = () => {
   const location = useLocation();
-  const [loggedIn, setLoggedIn] = useState(Boolean(localStorage.getItem('email')));
-
+  const [loggedIn, setLoggedIn] = useState<boolean>(Boolean(localStorage.getItem('email')));
+  
   useEffect(() => {
     setLoggedIn(Boolean(localStorage.getItem('username')));
   }, [location]);
-
+  
   return (
     <Navbar expand="sm" className="bg-body-secondary" fixed="top">
       <Container>
@@ -33,6 +33,6 @@ function Navigation() {
       </Container>
     </Navbar>
   );
-}
+};
 
 export default Navigation;
