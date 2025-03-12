@@ -96,7 +96,13 @@ app.delete("/api/auth", async (req, res) => {
 
 // getMe
 app.get("/api/user", async (req, res) => {
-  res.send({ email: "marta@id.com" });
+  const auth = req.cookies['auth'];
+  const user = await getUser("auth", auth);
+  if (user) {
+    res.send({ username: user.username });
+  } else {
+    res.status(401).send({ msg: "Unauthorized" });
+  }
 });
 
 app.listen(3000);
