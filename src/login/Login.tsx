@@ -4,6 +4,7 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
+import { Stack } from "react-bootstrap";
 
 export const Login: React.FC = () => {
   const [username, setUsername] = useState<string>("");
@@ -11,14 +12,14 @@ export const Login: React.FC = () => {
   const navigate = useNavigate();
 
   async function submitContent(e: FormEvent, isLogin: boolean): Promise<void> {
-    console.log("submitContent! isLogin: ", isLogin);
+    //console.log("submitContent! isLogin: ", isLogin);
     e.preventDefault();
     const response = await fetch("/api/auth", {
       method: isLogin ? "PUT" : "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ username, password: password }),
+      body: JSON.stringify({ username: username, password: password }),
     });
     
     if (response.ok) {
@@ -35,7 +36,7 @@ export const Login: React.FC = () => {
         <Form className="p-4">
           <h1>Login</h1>
           <hr />
-          <Form.Group className="mb-3" controlID="formBasicEmail">
+          <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Label>Username</Form.Label>
             <Form.Control
               placeholder="Username"
@@ -44,22 +45,24 @@ export const Login: React.FC = () => {
               required
             />
           </Form.Group>
-          <Form.Group className="mb-3" controlID="formBasicPassword">
+          <Form.Group className="mb-3" controlId="formBasicPassword">
             <Form.Label>Password</Form.Label>
             <Form.Control
               type="password"
-              placeholder="password"
+              placeholder="Choose a good password!"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
           </Form.Group>
-          <Button variant="primary" onClick={(e) => submitContent(e, true)}>
-            Login
-          </Button>
-          <Button variant="primary" onClick={(e) => submitContent(e, false)}>
-            Register
-          </Button>
+          <Stack direction="horizontal" gap={2} className="mb-3">
+            <Button variant="primary" onClick={(e) => submitContent(e, true)}>
+              Login
+            </Button>
+            <Button variant="primary" onClick={(e) => submitContent(e, false)}>
+              Register
+            </Button>
+          </Stack>
         </Form>
       </Card>
     </Container>

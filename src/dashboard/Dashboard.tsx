@@ -38,10 +38,19 @@ const Dashboard: React.FC = () => {
     }
   }, [articles]);
   
-  const logout = (): void => {
-    localStorage.removeItem("username");
-    localStorage.removeItem("password");
-    navigate("/");
+  const logout = async (): Promise<void> => {
+    try {
+      const response = await fetch("/api/auth", {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        navigate("/");
+      } else {
+        console.error("Logout failed");
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
   };
   
   return (
