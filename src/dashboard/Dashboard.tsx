@@ -4,18 +4,12 @@ import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
 import { useNavigate } from "react-router-dom";
+import { useArticles } from "../contexts/ArticlesContext";
 import Articles from "./Articles";
-
-interface Article {
-  id: string;
-  title: string;
-  content: string;
-  date: string;
-  // Add other properties as needed
-}
 
 const Dashboard: React.FC = () => {
   const [username, setUsername] = useState<string>("[loading]");
+  const { articles, isLoading } = useArticles();
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -33,23 +27,6 @@ const Dashboard: React.FC = () => {
     fetchUsername();
   }, []);
   const navigate = useNavigate();
-  const [articles, setArticles] = useState<Article[]>([]);
-  
-  // Call to service when articles are updated
-  useEffect(() => {
-    const fetchArticles = async () => {
-      try {
-        const response = await fetch("/api/articles", {
-          method: "GET",
-        });
-        const data = await response.json();
-        setArticles(data);
-      } catch (error) {
-        console.error("Error fetching articles:", error);
-      }
-    }
-    fetchArticles();
-  }, []);
   
   const logout = async (): Promise<void> => {
     try {
@@ -95,7 +72,11 @@ const Dashboard: React.FC = () => {
           <p>Coming soon!</p>
         </Card>
       </Stack>
-      <Articles articles={articles} />
+      {isLoading ? (
+        <p>Loading articles...</p>
+      ) : (
+        <Articles articles={articles} />
+      )}
     </Container>
   );
 };

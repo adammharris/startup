@@ -110,6 +110,7 @@ app.get("/api/user", async (req, res) => {
 
 // get articles
 app.get("/api/articles", async (req, res) => {
+  console.log("get articles: Recieved request for articles");
   const auth = req.cookies['auth'];
   const user = await getUser("auth", auth);
   if (user) {
@@ -121,24 +122,39 @@ app.get("/api/articles", async (req, res) => {
 
 // add article
 app.post("/api/articles", async (req, res) => {
+  const article = {
+    id: uuid.v4(),
+    content: req.body.content,
+    date: new Date().toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    }),
+    tags: req.body.tags,
+    title: req.body.title
+  };
+  console.log("add article: Recieved request to add article: " + article.title);
   const auth = req.cookies['auth'];
   const user = await getUser("auth", auth);
   if (user) {
-    user.articles.push(req.body.article);
+    user.articles.push(article);
     res.send({ msg: "Article added" });
   } else {
+    console.log("add article: User not found, ignoring request");
     res.status(401).send({ msg: "Unauthorized" });
   }
 });
 
 // delete article
 app.delete("/api/articles", async (req, res) => {
+  console.log("delete article: Recieved request to delete article: " + req.body.title);
   const auth = req.cookies['auth'];
   const user = await getUser("auth", auth);
   if (user) {
-    user.articles = user.articles.filter(article => article !== req.body.article);
+    user.articles = user.articles.filter(article => article.title !== req.body.title);
     res.send({ msg: "Article deleted" });
   } else {
+    console.log("delete article: User not found, ignoring request");
     res.status(401).send({ msg: "Unauthorized" });
   }
 });

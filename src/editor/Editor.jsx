@@ -5,6 +5,7 @@ import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import { useNavigate } from "react-router-dom";
+import { useArticles } from "../contexts/ArticlesContext";
 import PlainQuillEditor from "./PlainQuillEditor";
 
 export default function Editor({ article = {}, onSave, onCancel }) {
@@ -13,42 +14,51 @@ export default function Editor({ article = {}, onSave, onCancel }) {
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState(article.tags || []);
   const [tagError, setTagError] = useState("");
+  const [isSaving, setSaving] = useState(false);
   const navigate = useNavigate();
+  const { fetchArticles } = useArticles();
 
   // Constants
   const MAX_TAG_LENGTH = 30;
 
-  const handleSave = (savedArticle) => {
-    // For real app: Save to API
-    // For now, save to localStorage
+  const saveArticle = async (articleData) => {
+    setSaving(true);
     try {
-      const savedArticles = JSON.parse(
-        localStorage.getItem("articles") || "[]",
-      );
-
-      let updatedArticles;
-      if (savedArticle.id) {
-        // Update existing article
-        updatedArticles = savedArticles.map((a) =>
-          a.id === savedArticle.id ? savedArticle : a,
-        );
-      } else {
-        // Create new article
-        updatedArticles = [
-          { ...savedArticle, id: Date.now() },
-          ...savedArticles,
-        ];
+      const response = await fetch("/api/articles", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(articleData),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to save article: ${response.status} ${response.statusText}`);
       }
+      
+      const data = await response.json();
+      console.log("Article saved:", data);
 
-      localStorage.setItem("articles", JSON.stringify(updatedArticles));
-      navigate("/dashboard");
+      //await fetchArticles();
+      
+      // Use the onSave callback if provided, otherwise navigate
+      if (onSave) {
+        onSave(data);
+      } else {
+        navigate("/dashboard");
+      }
+      
+      return data;
     } catch (error) {
       console.error("Error saving article:", error);
       alert("Failed to save article. Please try again.");
+      throw error;
+    } finally {
+      setSaving(false);
     }
-  };
+  }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newArticle = {
       ...article,
@@ -61,7 +71,20 @@ export default function Editor({ article = {}, onSave, onCancel }) {
         day: "numeric",
       }),
     };
-    handleSave(newArticle);
+    
+    try {
+      await saveArticle(newArticle);
+    } catch (error) {
+      // Error already handled in saveArticle
+    }
+  };
+
+  const handleCancel = () => {
+    if (onCancel) {
+      onCancel();
+    } else {
+      navigate("/dashboard");
+    }
   };
 
   const handleTagInputChange = (e) => {
@@ -193,12 +216,12 @@ export default function Editor({ article = {}, onSave, onCancel }) {
             <div className="d-flex justify-content-end gap-2 mt-4">
               <Button
                 variant="secondary"
-                onClick={() => navigate("/dashboard")}
+                onClick={handleCancel}
                 type="button"
               >
                 Cancel
               </Button>
-              <Button variant="primary" type="submit">
+              <Button variant="primary" type="submit" disabled={isSaving}>
                 Save Article
               </Button>
             </div>

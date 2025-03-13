@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ArticlesProvider } from "./contexts/ArticlesContext";  
 import "./App.css";
 import Navigation from "./navigation/Navigation";
 import Home from "./home/Home";
@@ -21,6 +22,7 @@ const NotFound: React.FC = () => {
 const App: React.FC = () => {
   return (
     <BrowserRouter>
+      <ArticlesProvider>
       <div className="App d-flex flex-column min-vh-100 pt-4 pb-5 bg-primary">
         <Navigation />
         <div className="body flex-grow-1 pt-5">
@@ -37,6 +39,7 @@ const App: React.FC = () => {
         </div>
         <Footer />
       </div>
+      </ArticlesProvider>
     </BrowserRouter>
   );
 };
