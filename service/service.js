@@ -146,12 +146,13 @@ app.post("/api/articles", async (req, res) => {
 });
 
 // delete article
-app.delete("/api/articles", async (req, res) => {
-  console.log("delete article: Recieved request to delete article: " + req.body.title);
+app.delete("/api/articles/:title", async (req, res) => {
+  const articleTitle = req.params.title;
+  console.log("delete article: Recieved request to delete article: " + articleTitle);
   const auth = req.cookies['auth'];
   const user = await getUser("auth", auth);
   if (user) {
-    user.articles = user.articles.filter(article => article.title !== req.body.title);
+    user.articles = user.articles.filter(article => article.title !== articleTitle);
     res.send({ msg: "Article deleted" });
   } else {
     console.log("delete article: User not found, ignoring request");

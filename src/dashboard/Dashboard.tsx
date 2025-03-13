@@ -3,13 +3,15 @@ import { Stack } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useArticles } from "../contexts/ArticlesContext";
 import Articles from "./Articles";
 
 const Dashboard: React.FC = () => {
   const [username, setUsername] = useState<string>("[loading]");
-  const { articles, isLoading } = useArticles();
+  const { articles, isLoading, fetchArticles} = useArticles();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -26,7 +28,12 @@ const Dashboard: React.FC = () => {
 
     fetchUsername();
   }, []);
-  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchArticles();
+    // This effect will run when the component mounts and when location changes
+  }, [location, fetchArticles]);
+  
   
   const logout = async (): Promise<void> => {
     try {
