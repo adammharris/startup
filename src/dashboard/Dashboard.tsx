@@ -15,28 +15,41 @@ interface Article {
 }
 
 const Dashboard: React.FC = () => {
-  const username = localStorage.getItem("username") || "Guest";
-  const navigate = useNavigate();
-  const [articles, setArticles] = useState<Article[]>(() => {
-    try {
-      // Get articles (later, get from backend)
-      const savedArticles = localStorage.getItem("articles");
-      return savedArticles ? JSON.parse(savedArticles) : [];
-    } catch (error) {
-      console.error("Error parsing articles from localStorage:", error);
-      return [];
-    }
-  });
-  
-  // Update localStorage whenever articles state changes
-  // Later, use Websockets or something
+  const [username, setUsername] = useState<string>("[loading]");
+
   useEffect(() => {
-    try {
-      localStorage.setItem("articles", JSON.stringify(articles));
-    } catch (error) {
-      console.error("Error saving articles to localStorage:", error);
+    const fetchUsername = async () => {
+      try {
+        const response = await fetch("/api/user", {
+          method: "GET",
+        });
+        const data = await response.json();
+        setUsername(data.username);
+      } catch (error) {
+        console.error("Error fetching username:", error);
+      }
+    };
+
+    fetchUsername();
+  }, []);
+  const navigate = useNavigate();
+  const [articles, setArticles] = useState<Article[]>([]);
+  
+  // Call to service when articles are updated
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        const response = await fetch("/api/articles", {
+          method: "GET",
+        });
+        const data = await response.json();
+        setArticles(data);
+      } catch (error) {
+        console.error("Error fetching articles:", error);
+      }
     }
-  }, [articles]);
+    fetchArticles();
+  }, []);
   
   const logout = async (): Promise<void> => {
     try {

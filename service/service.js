@@ -16,6 +16,7 @@ async function createUser(username, password) {
   const user = {
     username: username,
     passwordHash: passwordHash,
+    articles: [],
   };
   users.push(user);
   return user;
@@ -96,10 +97,47 @@ app.delete("/api/auth", async (req, res) => {
 
 // getMe
 app.get("/api/user", async (req, res) => {
+  console.log("getMe: Checking user");
   const auth = req.cookies['auth'];
   const user = await getUser("auth", auth);
   if (user) {
+    console.log("getMe: User found: " + user.username);
     res.send({ username: user.username });
+  } else {
+    res.status(401).send({ msg: "Unauthorized" });
+  }
+});
+
+// get articles
+app.get("/api/articles", async (req, res) => {
+  const auth = req.cookies['auth'];
+  const user = await getUser("auth", auth);
+  if (user) {
+    res.send(user.articles);
+  } else {
+    res.status(401).send({ msg: "Unauthorized" });
+  }
+});
+
+// add article
+app.post("/api/articles", async (req, res) => {
+  const auth = req.cookies['auth'];
+  const user = await getUser("auth", auth);
+  if (user) {
+    user.articles.push(req.body.article);
+    res.send({ msg: "Article added" });
+  } else {
+    res.status(401).send({ msg: "Unauthorized" });
+  }
+});
+
+// delete article
+app.delete("/api/articles", async (req, res) => {
+  const auth = req.cookies['auth'];
+  const user = await getUser("auth", auth);
+  if (user) {
+    user.articles = user.articles.filter(article => article !== req.body.article);
+    res.send({ msg: "Article deleted" });
   } else {
     res.status(401).send({ msg: "Unauthorized" });
   }
