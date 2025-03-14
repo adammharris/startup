@@ -4,12 +4,13 @@ import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
 import { useNavigate } from "react-router-dom";
 import Articles from "../components/Articles";
+import WeatherWidget from "../components/WeatherWidget";
 import { useAuth } from "../contexts/UserContext";
 import Spinner from "react-bootstrap/Spinner";
 import { useEffect } from "react";
 
 const Dashboard: React.FC = () => {
-  const { loading, username, checkAuthStatus} = useAuth();
+  const { loading, username, checkAuthStatus } = useAuth();
   const navigate = useNavigate();
   
   if (loading) {
@@ -58,7 +59,8 @@ const Dashboard: React.FC = () => {
           </Button>
         </div>
       </Card>
-      <Stack direction="horizontal" gap={3}>
+      
+      <Stack direction="horizontal" gap={3} className="my-3">
         <Card className="p-3">
           <h2>My Account</h2>
           <p>Username: {username}</p>
@@ -70,8 +72,10 @@ const Dashboard: React.FC = () => {
           <h2>My Favorites</h2>
           <p>Coming soon!</p>
         </Card>
+        <WeatherWidget />
       </Stack>
-        <Articles />
+      
+      <Articles />
     </Container>
   );
 };
