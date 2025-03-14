@@ -1,29 +1,39 @@
+/* Global styles */
 menu {
   flex: 1;
   display: flex;
-  /*  overwrite Bootstrap so the menu does not wrap */
-  flex-direction: row !important;
+  flex-direction: row !important; /* overwrite Bootstrap */
   list-style: none;
 }
 
+/* App container */
 .App {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  min-height: 100vh; /* Fill the viewport height */
 }
 
-.bg-primary {
-  background-color: #5daac8 !important;  /* your custom blue */
+/* Make bg-primary more specific */
+.App .bg-primary,
+.navbar.bg-primary {
+  background-color: #5daac8 !important;
 }
 
-
-.card-group {
-  gap: 1rem; /* Works in Bootstrap 5 since the card-group is a flex container */
-}
-
-.card {
+/* Make card styles more specific */
+.App .card {
   margin: 10px;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 20px !important;
+}
+
+/* Content container to push footer down */
+.content-container {
+  flex: 1;
+  padding-bottom: 60px; /* Space for footer */
+}
+
+/* Card groups */
+.card-group {
+  gap: 1rem;
 }

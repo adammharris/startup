@@ -1,6 +1,7 @@
 import Card from "react-bootstrap/Card";
 import CardGroup from "react-bootstrap/CardGroup";
 import Container from "react-bootstrap/Container";
+
 import access from "./access_levels.svg";
 import share from "./share_with_friends.svg";
 import upload from "./upload_journal.svg";
@@ -19,7 +20,7 @@ export const Home: React.FC = () => {
       </Card>
       <CardGroup className="d-flex flex-column flex-sm-row justify-content-center">
         <Card className="card-responsive">
-          <Card.Img variant="top" src={upload} fluid />
+          <Card.Img variant="top" src={upload} />
           <Card.Body>
             <Card.Title>Upload your journal</Card.Title>
             <Card.Text>
@@ -29,7 +30,7 @@ export const Home: React.FC = () => {
           </Card.Body>
         </Card>
         <Card className="card-responsive">
-          <Card.Img variant="top" src={access} fluid />
+          <Card.Img variant="top" src={access} />
           <Card.Body>
             <Card.Title>Assign access levels</Card.Title>
             <Card.Text>
@@ -39,7 +40,7 @@ export const Home: React.FC = () => {
           </Card.Body>
         </Card>
         <Card className="card-responsive">
-          <Card.Img variant="top" src={share} fluid />
+          <Card.Img variant="top" src={share} />
           <Card.Body>
             <Card.Title>Share with friends</Card.Title>
             <Card.Text>

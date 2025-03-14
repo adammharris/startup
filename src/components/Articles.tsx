@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import Article from "./Article";
+import Article from "./Article.tsx";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
+import Spinner from "react-bootstrap/Spinner";
 import { useNavigate } from "react-router-dom";
-import { useArticles } from "../contexts/ArticlesContext";
+import { useArticles } from "../contexts/UserContext.tsx";
 
 interface ArticleType {
   id: string;
@@ -16,18 +17,24 @@ interface ArticleType {
 }
 
 interface ArticlesProps {
-  articles: ArticleType[];
+  articles?: ArticleType[]; // Make optional to allow using context
 }
 
-const Articles: React.FC<ArticlesProps> = ({ articles: initialArticles }) => {
-  const [articles, setArticles] = useState<ArticleType[]>(initialArticles);
+const Articles: React.FC<ArticlesProps> = ({ articles: propArticles }) => {
   const navigate = useNavigate();
-  const { fetchArticles } = useArticles();
+  const { articles: contextArticles, fetchArticles, isLoading } = useArticles();
   
-  // Update local state when props change
+  // Use either props or context articles
+  const articles = propArticles || contextArticles || [];
+  
+  // For debugging - remove in production
   useEffect(() => {
-    setArticles(initialArticles);
-  }, [initialArticles]);
+    console.log("Articles component received:", { 
+      fromProps: propArticles?.length || 0,
+      fromContext: contextArticles?.length || 0,
+      isLoading
+    });
+  }, [propArticles, contextArticles, isLoading]);
   
   const handleDeleteArticle = async (title: string): Promise<void> => {
     try {
@@ -39,16 +46,25 @@ const Articles: React.FC<ArticlesProps> = ({ articles: initialArticles }) => {
         throw new Error(`Failed to delete article: ${response.status}`);
       }
       
-      // Update local state first for immediate UI feedback
-      setArticles((prevArticles) => prevArticles.filter((article) => article.title !== title));
-      
-      // Then refresh all articles from the server to ensure data consistency
+      // Refresh articles from the server
       await fetchArticles();
       
     } catch (error) {
       console.error("Error deleting article:", error);
     }
   };
+  
+  // Show loading indicator
+  if (isLoading) {
+    return (
+      <div className="text-center my-5">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+        <p className="mt-2">Loading articles...</p>
+      </div>
+    );
+  }
   
   // Check if there are no articles to display
   if (!articles || articles.length === 0) {
@@ -71,7 +87,7 @@ const Articles: React.FC<ArticlesProps> = ({ articles: initialArticles }) => {
   return (
     <Row xs={1} md={2} className="g-4 mt-2">
       {articles.map((article) => (
-        <Col key={article.id}>
+        <Col key={article.id || article.title}>
           <Article article={article} onDelete={() => handleDeleteArticle(article.title)} />
         </Col>
       ))}

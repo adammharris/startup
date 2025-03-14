@@ -1,40 +1,36 @@
-import { useEffect, useState } from "react";
 import { Stack } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useArticles } from "../contexts/ArticlesContext";
-import Articles from "./Articles";
+import { useNavigate } from "react-router-dom";
+import Articles from "../components/Articles";
+import { useAuth } from "../contexts/UserContext";
+import Spinner from "react-bootstrap/Spinner";
+import { useEffect } from "react";
 
 const Dashboard: React.FC = () => {
-  const [username, setUsername] = useState<string>("[loading]");
-  const { articles, isLoading, fetchArticles} = useArticles();
+  const { loading, username, checkAuthStatus} = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
+  
+  if (loading) {
+    return (
+      <Container className="text-center my-5">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+        <p>Loading your dashboard...</p>
+      </Container>
+    );
+  }
 
   useEffect(() => {
-    const fetchUsername = async () => {
-      try {
-        const response = await fetch("/api/user", {
-          method: "GET",
-        });
-        const data = await response.json();
-        setUsername(data.username);
-      } catch (error) {
-        console.error("Error fetching username:", error);
-      }
-    };
+    console.log("Dashboard component loaded with username:", username);
+    // If username is null after loading completes, try to refresh auth status
+    /*if (!loading && !username) {
+      checkAuthStatus();
+    }*/
+  }, [loading, username, checkAuthStatus]);
 
-    fetchUsername();
-  }, []);
-
-  useEffect(() => {
-    fetchArticles();
-    // This effect will run when the component mounts and when location changes
-  }, [location, fetchArticles]);
-  
-  
   const logout = async (): Promise<void> => {
     try {
       const response = await fetch("/api/auth", {
@@ -79,11 +75,7 @@ const Dashboard: React.FC = () => {
           <p>Coming soon!</p>
         </Card>
       </Stack>
-      {isLoading ? (
-        <p>Loading articles...</p>
-      ) : (
-        <Articles articles={articles} />
-      )}
+        <Articles />
     </Container>
   );
 };

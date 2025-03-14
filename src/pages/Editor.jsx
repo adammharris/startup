@@ -5,8 +5,8 @@ import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import { useNavigate } from "react-router-dom";
-import { useArticles } from "../contexts/ArticlesContext";
-import PlainQuillEditor from "./PlainQuillEditor";
+import { useArticles } from "../contexts/UserContext.tsx";
+import PlainQuillEditor from "../components/PlainQuillEditor";
 
 export default function Editor({ article = {}, onSave, onCancel }) {
   const [title, setTitle] = useState(article.title || "");

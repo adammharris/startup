@@ -1,16 +1,11 @@
-import { useState, useEffect } from 'react';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink } from 'react-router-dom';
+import { useAuth } from '../contexts/UserContext';
 
 const Navigation: React.FC = () => {
-  const location = useLocation();
-  const [loggedIn, setLoggedIn] = useState<boolean>(Boolean(localStorage.getItem('email')));
-  
-  useEffect(() => {
-    setLoggedIn(Boolean(localStorage.getItem('username')));
-  }, [location]);
+  const { loggedIn } = useAuth();
   
   return (
     <Navbar expand="sm" className="bg-body-secondary" fixed="top">
