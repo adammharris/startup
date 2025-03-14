@@ -12,14 +12,54 @@ interface CommentType {
 
 interface CommentsProps {
   accordionKey?: string;
+  articleTitle: string;
+  isVisible?: boolean;
 }
 
-const Comments: React.FC<CommentsProps> = ({ accordionKey = "0" }) => {
-  const [comments, setComments] = useState<CommentType[]>([
-    { username: "testuser1", id: 1, text: "Here is a test comment!" },
-  ]);
+const Comments: React.FC<CommentsProps> = ({ accordionKey = "0", articleTitle, isVisible = false }) => {
+  const [comments, setComments] = useState<CommentType[]>([]);
   const [newComment, setNewComment] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const commentsContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const fetchComments = async () => {
+    if (!articleTitle) return;
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const encodedTitle = encodeURIComponent(articleTitle);
+      const response = await fetch(`/api/comments/${encodedTitle}`);
+      
+      if (!response.ok) {
+        throw new Error(`Error fetching comments: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setComments(data);
+    } catch (err) {
+      console.error("Failed to fetch comments:", err);
+      setError("Failed to load comments");
+    } finally {
+      setIsLoading(false);
+    }
+
+  };
+
+  // Fetch comments when component mounts or article title changes
+  useEffect(() => {
+    fetchComments();
+  }, [articleTitle]);
+
+  // Fetch comments when the component is visible
+  useEffect(() => {
+    if (isVisible) {
+      fetchComments();
+    }
+  }
+  , [isVisible]);
 
   // This useEffect will run whenever the comments array changes
   useEffect(() => {
@@ -29,13 +69,15 @@ const Comments: React.FC<CommentsProps> = ({ accordionKey = "0" }) => {
     }
   }, [comments]);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     if (!newComment.trim()) return;
 
+    const username = "unknown"
+
     // Add new comment to the list with a unique ID
     const newCommentObj: CommentType = {
-      username: localStorage.getItem("username") || "Anonymous",
+      username,
       id: Date.now(),
       text: newComment,
     };
@@ -44,6 +86,26 @@ const Comments: React.FC<CommentsProps> = ({ accordionKey = "0" }) => {
 
     // Clear the input
     setNewComment("");
+
+    try {
+      const encodedTitle = encodeURIComponent(articleTitle);
+      const response = await fetch(`/api/comments/${encodedTitle}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newCommentObj),
+      });
+      if (!response.ok) {
+        throw new Error(`Error posting comment: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log("Comment posted successfully:", data);
+    } catch (err) {
+      console.error("Failed to post comment:", err);
+      setComments(comments.filter(c => c.id !== newCommentObj.id));
+      setError("Failed to post comment");
+    }
   };
 
   return (

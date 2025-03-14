@@ -160,4 +160,59 @@ app.delete("/api/articles/:title", async (req, res) => {
   }
 });
 
+// add comment to article
+app.post("/api/comments/:title", async (req, res) => {
+  const articleTitle = req.params.title;
+  const comment = {
+    id: uuid.v4(),
+    text: req.body.text,
+    date: new Date().toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    }),
+  };
+  console.log("add comment: Recieved request to add comment to article: " + articleTitle);
+  const auth = req.cookies['auth'];
+  const user = await getUser("auth", auth);
+  if (user) {
+    const article = user.articles.find(article => article.title === articleTitle);
+    if (article) {
+      if (!article.comments) {
+        article.comments = [];
+      }
+      comment.username = user.username;
+      article.comments.push(comment);
+      res.send({ msg: "Comment added" });
+    } else {
+      console.log("add comment: Article not found, ignoring request");
+      res.status(404).send({ msg: "Article not found" });
+    }
+  } else {
+    console.log("add comment: User not found, ignoring request");
+    res.status(401).send({ msg: "Unauthorized" });
+  }
+});
+
+// get comments
+app.get("/api/comments/:title", async (req, res) => {
+  const articleTitle = req.params.title;
+  console.log("get comments: Recieved request for comments on article: " + articleTitle);
+  const auth = req.cookies['auth'];
+  const user = await getUser("auth", auth);
+  if (user) {
+    const article = user.articles.find(article => article.title === articleTitle);
+    if (article) {
+      res.send(article.comments || []);
+    } else {
+      console.log("get comments: Article not found, ignoring request");
+      res.status(404).send({ msg: "Article not found" });
+    }
+  } else {
+    console.log("get comments: User not found, ignoring request");
+    res.status(401).send({ msg: "Unauthorized" });
+  }
+}
+);
+
 app.listen(3000);

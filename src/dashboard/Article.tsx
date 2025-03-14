@@ -196,7 +196,11 @@ const Article: React.FC<ArticleProps> = ({ article, onDelete }) => {
         </Modal.Body>
         <Modal.Footer>
           <Stack direction="horizontal" className="w-100" gap={3}>
-            <Comments accordionKey={`comments-${article.id}`} />
+            <Comments 
+              accordionKey={`comments-${article.id}`}
+              articleTitle={article.title}
+              isVisible = {showModal}
+            />
             <Button
               variant="outline-danger"
               onClick={() => setShowDeleteConfirm(true)}
