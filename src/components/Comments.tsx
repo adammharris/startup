@@ -77,12 +77,11 @@ const Comments: React.FC<CommentsProps> = ({ accordionKey = "0", articleTitle, i
     if (!newComment.trim()) return;
 
     // Use the actual username from context, or a placeholder if not available
-    const currentUsername = username || "Anonymous";
+    const currentUsername = username || "[Loading…]";
 
-    // Create the new comment object with unique ID and current timestamp
     const newCommentObj: CommentType = {
       username: currentUsername,
-      date: new Date().toISOString(), // Use ISO string format for better compatibility
+      date: new Date().toISOString(),
       id: Date.now(),
       text: newComment,
     };

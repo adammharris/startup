@@ -185,7 +185,7 @@ app.post("/api/comments/:title", async (req, res) => {
         article.comments = [];
       }
       comment.username = user.username;
-      article.comments.push(comment);
+      article.comments.unshift(comment);
       res.send({ msg: "Comment added" });
     } else {
       console.log("add comment: Article not found, ignoring request");
