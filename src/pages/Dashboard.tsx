@@ -25,10 +25,6 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     console.log("Dashboard component loaded with username:", username);
-    // If username is null after loading completes, try to refresh auth status
-    /*if (!loading && !username) {
-      checkAuthStatus();
-    }*/
   }, [loading, username, checkAuthStatus]);
 
   const logout = async (): Promise<void> => {

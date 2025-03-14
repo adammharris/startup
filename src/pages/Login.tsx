@@ -1,32 +1,47 @@
 import { useState, FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
 import { Stack } from "react-bootstrap";
+import { useAuth } from "../contexts/UserContext";
 
 export const Login: React.FC = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const navigate = useNavigate();
+  const location = useLocation();
+  const { setLoggedIn } = useAuth();
+  
+  // Get redirectUrl from state or use dashboard as default
+  const from = location.state?.from?.pathname || "/dashboard";
 
   async function submitContent(e: FormEvent, isLogin: boolean): Promise<void> {
-    //console.log("submitContent! isLogin: ", isLogin);
     e.preventDefault();
-    const response = await fetch("/api/auth", {
-      method: isLogin ? "PUT" : "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username: username, password: password }),
-    });
-    
-    if (response.ok) {
-      navigate("/dashboard");
-    } else {
-      const data = await response.json();
-      alert(data.msg);
+    try {
+      const response = await fetch("/api/auth", {
+        method: isLogin ? "PUT" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username: username, password: password }),
+      });
+      
+      if (response.ok) {
+        // Update the login state in context
+        setLoggedIn(true);
+        
+        // Navigate to the dashboard or the original destination
+        console.log("Login successful, redirecting to:", from);
+        navigate(from, { replace: true });
+      } else {
+        const data = await response.json();
+        alert(data.msg);
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("An error occurred. Please try again.");
     }
   }
 

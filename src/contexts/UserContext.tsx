@@ -12,6 +12,7 @@ interface Article {
 interface UserContextType {
   // Auth-related state
   loggedIn: boolean;
+  setLoggedIn: (value: boolean) => void; // Add this line
   authLoading: boolean;
   checkAuthStatus: () => Promise<void>;
   username: string | null;
@@ -88,6 +89,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       value={{ 
         // Auth
         loggedIn, 
+        setLoggedIn, // Add this line
         authLoading, 
         checkAuthStatus,
         // Articles
@@ -112,8 +114,8 @@ export const useUser = () => {
 
 // For backward compatibility or more focused use
 export const useAuth = () => {
-  const { loggedIn, authLoading, checkAuthStatus, username} = useUser();
-  return { loggedIn, loading: authLoading, checkAuthStatus, username};
+  const { loggedIn, setLoggedIn, authLoading, checkAuthStatus, username } = useUser();
+  return { loggedIn, setLoggedIn, loading: authLoading, checkAuthStatus, username };
 };
 
 export const useArticles = () => {

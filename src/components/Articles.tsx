@@ -5,7 +5,7 @@ import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useArticles } from "../contexts/UserContext.tsx";
 
 interface ArticleType {
@@ -18,23 +18,36 @@ interface ArticleType {
 
 interface ArticlesProps {
   articles?: ArticleType[]; // Make optional to allow using context
+  refreshOnMount?: boolean; // Add option to force refresh when component mounts
 }
 
-const Articles: React.FC<ArticlesProps> = ({ articles: propArticles }) => {
+const Articles: React.FC<ArticlesProps> = ({ 
+  articles: propArticles, 
+  refreshOnMount = true 
+}) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { articles: contextArticles, fetchArticles, isLoading } = useArticles();
+  const [localLoading, setLocalLoading] = useState<boolean>(false);
   
   // Use either props or context articles
   const articles = propArticles || contextArticles || [];
   
-  // For debugging - remove in production
+  // Fetch articles when component mounts or when location changes
   useEffect(() => {
-    console.log("Articles component received:", { 
-      fromProps: propArticles?.length || 0,
-      fromContext: contextArticles?.length || 0,
-      isLoading
-    });
-  }, [propArticles, contextArticles, isLoading]);
+    const loadArticles = async () => {
+      setLocalLoading(true);
+      try {
+        await fetchArticles();
+      } finally {
+        setLocalLoading(false);
+      }
+    };
+    
+    if (refreshOnMount) {
+      loadArticles();
+    }
+  }, [location, fetchArticles, refreshOnMount]);
   
   const handleDeleteArticle = async (title: string): Promise<void> => {
     try {
@@ -55,7 +68,7 @@ const Articles: React.FC<ArticlesProps> = ({ articles: propArticles }) => {
   };
   
   // Show loading indicator
-  if (isLoading) {
+  if (isLoading || localLoading) {
     return (
       <div className="text-center my-5">
         <Spinner animation="border" role="status">

@@ -3,6 +3,7 @@ import Accordion from "react-bootstrap/Accordion";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Comment from "./Comment";
+import { useAuth } from "../contexts/UserContext";
 
 interface CommentType {
   username: string;
@@ -23,6 +24,7 @@ const Comments: React.FC<CommentsProps> = ({ accordionKey = "0", articleTitle, i
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const commentsContainerRef = useRef<HTMLDivElement | null>(null);
+  const { username } = useAuth(); // Add this line to get the current username
 
   const fetchComments = async () => {
     if (!articleTitle) return;
@@ -74,20 +76,25 @@ const Comments: React.FC<CommentsProps> = ({ accordionKey = "0", articleTitle, i
     e.preventDefault();
     if (!newComment.trim()) return;
 
-    const username = "Loading...";
+    // Use the actual username from context, or a placeholder if not available
+    const currentUsername = username || "Anonymous";
 
-    // Add new comment with placeholders
+    // Create the new comment object with unique ID and current timestamp
     const newCommentObj: CommentType = {
-      username,
-      date: Date.now().toString(),
+      username: currentUsername,
+      date: new Date().toISOString(), // Use ISO string format for better compatibility
       id: Date.now(),
       text: newComment,
     };
 
-    // Clear the input
+    // Cache the comment text in case we need to restore it after an error
+    const commentText = newComment;
+    
+    // Clear the input immediately for better UX
     setNewComment("");
 
-    setComments([newCommentObj, ...comments]);
+    // Add the new comment to the list optimistically
+    setComments(prevComments => [newCommentObj, ...prevComments]);
 
     try {
       const encodedTitle = encodeURIComponent(articleTitle);
@@ -98,19 +105,36 @@ const Comments: React.FC<CommentsProps> = ({ accordionKey = "0", articleTitle, i
         },
         body: JSON.stringify(newCommentObj),
       });
+      
       if (!response.ok) {
         throw new Error(`Error posting comment: ${response.status}`);
       }
+      
       const returnedComment = await response.json();
-      setComments((prevComments) =>
-        prevComments.map((comment) =>
-          comment.id === newCommentObj.id ? { ...comment, ...returnedComment } : comment
-        )
-      );
+      
+      // Only update if we got a valid response with required fields
+      if (returnedComment && returnedComment.text && returnedComment.username) {
+        // Update the comment with server response
+        setComments(prevComments =>
+          prevComments.map(comment =>
+            comment.id === newCommentObj.id ? returnedComment : comment
+          )
+        );
+        console.log("Comment updated with server response:", returnedComment);
+      } else {
+        console.error("Invalid comment response from server:", returnedComment);
+      }
     } catch (err) {
       console.error("Failed to post comment:", err);
-      setComments(comments.filter(c => c.id !== newCommentObj.id));
-      setError("Failed to post comment");
+      
+      // Remove the failed comment
+      setComments(prevComments => prevComments.filter(c => c.id !== newCommentObj.id));
+      
+      // Show error to user
+      setError("Failed to post comment. Please try again.");
+      
+      // Restore the comment text to the input so the user doesn't lose their work
+      setNewComment(commentText);
     }
   };
 
