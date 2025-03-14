@@ -24,8 +24,17 @@ export default function Editor({ article = {}, onSave, onCancel }) {
   const saveArticle = async (articleData) => {
     setSaving(true);
     try {
-      const response = await fetch("/api/articles", {
-        method: "POST",
+      // Determine if this is a new article or an update
+      const isUpdate = !!article.id;
+      
+      const url = isUpdate 
+        ? `/api/articles/${encodeURIComponent(article.title)}` // Update existing
+        : "/api/articles"; // Create new
+        
+      const method = isUpdate ? "PUT" : "POST";
+      
+      const response = await fetch(url, {
+        method: method,
         headers: {
           "Content-Type": "application/json",
         },
@@ -39,7 +48,7 @@ export default function Editor({ article = {}, onSave, onCancel }) {
       const data = await response.json();
       console.log("Article saved:", data);
 
-      //await fetchArticles();
+      await fetchArticles();
       
       // Use the onSave callback if provided, otherwise navigate
       if (onSave) {
@@ -72,11 +81,8 @@ export default function Editor({ article = {}, onSave, onCancel }) {
       }),
     };
     
-    try {
-      await saveArticle(newArticle);
-    } catch (error) {
-      // Error already handled in saveArticle
-    }
+    await saveArticle(newArticle);
+    navigate("/dashboard");
   };
 
   const handleCancel = () => {

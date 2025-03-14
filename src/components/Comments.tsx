@@ -8,6 +8,7 @@ interface CommentType {
   username: string;
   id: number;
   text: string;
+  date: string;
 }
 
 interface CommentsProps {
@@ -73,19 +74,20 @@ const Comments: React.FC<CommentsProps> = ({ accordionKey = "0", articleTitle, i
     e.preventDefault();
     if (!newComment.trim()) return;
 
-    const username = "unknown"
+    const username = "Loading...";
 
-    // Add new comment to the list with a unique ID
+    // Add new comment with placeholders
     const newCommentObj: CommentType = {
       username,
+      date: Date.now().toString(),
       id: Date.now(),
       text: newComment,
     };
 
-    setComments([newCommentObj, ...comments]);
-
     // Clear the input
     setNewComment("");
+
+    setComments([newCommentObj, ...comments]);
 
     try {
       const encodedTitle = encodeURIComponent(articleTitle);
@@ -99,8 +101,12 @@ const Comments: React.FC<CommentsProps> = ({ accordionKey = "0", articleTitle, i
       if (!response.ok) {
         throw new Error(`Error posting comment: ${response.status}`);
       }
-      const data = await response.json();
-      console.log("Comment posted successfully:", data);
+      const returnedComment = await response.json();
+      setComments((prevComments) =>
+        prevComments.map((comment) =>
+          comment.id === newCommentObj.id ? { ...comment, ...returnedComment } : comment
+        )
+      );
     } catch (err) {
       console.error("Failed to post comment:", err);
       setComments(comments.filter(c => c.id !== newCommentObj.id));
@@ -129,6 +135,7 @@ const Comments: React.FC<CommentsProps> = ({ accordionKey = "0", articleTitle, i
               {comments.map((comment) => (
                 <Comment
                   username={comment.username}
+                  date={comment.date}
                   id={comment.id}
                   key={comment.id}
                   text={comment.text}

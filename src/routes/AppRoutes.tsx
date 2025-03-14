@@ -1,5 +1,5 @@
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/UserContext';
+import { Routes, Route, Navigate, useLocation, useParams, useNavigate } from 'react-router-dom';
+import { useAuth, useArticles } from '../contexts/UserContext';
 
 // Import your page components
 import Home from '../pages/Home.tsx';
@@ -33,6 +33,27 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   return <>{children}</>;
 };
 
+const EditArticle = () => {
+  const { id } = useParams();
+  const { articles } = useArticles();
+  const navigate = useNavigate();
+  
+  // Find the article to edit
+  const articleToEdit = articles.find(article => article.id === id);
+  
+  if (!articleToEdit) {
+    return <div className="container mt-5 pt-5">Article not found</div>;
+  }
+  
+  return (
+    <Editor 
+      article={articleToEdit}
+      onSave={() => navigate('/dashboard')}
+      onCancel={() => navigate('/dashboard')}
+    />
+  );
+};
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -60,6 +81,15 @@ const AppRoutes = () => {
               onSave={() => console.log('Save action triggered')} 
               onCancel={() => console.log('Cancel action triggered')} 
             />
+          </ProtectedRoute>
+        } 
+      />
+      
+      <Route 
+        path="/editor/:id" 
+        element={
+          <ProtectedRoute>
+            <EditArticle />
           </ProtectedRoute>
         } 
       />

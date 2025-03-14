@@ -163,16 +163,19 @@ app.delete("/api/articles/:title", async (req, res) => {
 // add comment to article
 app.post("/api/comments/:title", async (req, res) => {
   const articleTitle = req.params.title;
+  const {text} = req.body;
+  console.log("add comment: Recieved request to add comment to article: " + articleTitle);
+  const filteredText = await filterProfanity(text);
   const comment = {
     id: uuid.v4(),
-    text: req.body.text,
+    text: filteredText,
     date: new Date().toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
     }),
   };
-  console.log("add comment: Recieved request to add comment to article: " + articleTitle);
+  
   const auth = req.cookies['auth'];
   const user = await getUser("auth", auth);
   if (user) {
@@ -212,7 +215,56 @@ app.get("/api/comments/:title", async (req, res) => {
     console.log("get comments: User not found, ignoring request");
     res.status(401).send({ msg: "Unauthorized" });
   }
+});
+
+async function filterProfanity(text) {
+  try {
+    const encodedText = encodeURIComponent(text);
+    const response = await fetch(
+      `https://www.purgomalum.com/service/json?text=${encodedText}`
+    );
+    
+    if (!response.ok) {
+      console.error("PurgoMalum API error:", response.status);
+      return text; // Return original text if API fails
+    }
+    
+    const data = await response.json();
+    return data.result;
+  } catch (error) {
+    console.error("Error filtering profanity:", error);
+    return text; // Fallback to original text
+  }
 }
-);
+
+// Update article
+app.put("/api/articles/:title", async (req, res) => {
+  const articleTitle = req.params.title;
+  console.log("update article: Received request to update article:", articleTitle);
+  
+  const auth = req.cookies['auth'];
+  const user = await getUser("auth", auth);
+  
+  if (user) {
+    const articleIndex = user.articles.findIndex(a => a.title === articleTitle);
+    
+    if (articleIndex !== -1) {
+      // Keep the existing ID but update other properties
+      const articleId = user.articles[articleIndex].id;
+      user.articles[articleIndex] = {
+        ...req.body,
+        id: articleId
+      };
+      
+      res.send({ msg: "Article updated" });
+    } else {
+      console.log("update article: Article not found");
+      res.status(404).send({ msg: "Article not found" });
+    }
+  } else {
+    console.log("update article: User not found, ignoring request");
+    res.status(401).send({ msg: "Unauthorized" });
+  }
+});
 
 app.listen(3000);
