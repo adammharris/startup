@@ -6,31 +6,19 @@ menu {
   list-style: none;
 }
 
-/* App container */
-.App {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh; /* Fill the viewport height */
-}
-
-/* Make bg-primary more specific */
-.App .bg-primary,
-.navbar.bg-primary {
-  background-color: #5daac8 !important;
+body {
+  background-color: #5daac8;
+  margin-top: 70px;
+  margin-bottom: 70px;
+  padding: 0;
 }
 
 /* Make card styles more specific */
-.App .card {
+.card {
   margin: 10px;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 20px !important;
-}
-
-/* Content container to push footer down */
-.content-container {
-  flex: 1;
-  padding-bottom: 60px; /* Space for footer */
 }
 
 /* Card groups */
