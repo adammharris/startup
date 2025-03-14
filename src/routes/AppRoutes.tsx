@@ -55,6 +55,8 @@ const EditArticle = () => {
 };
 
 const AppRoutes = () => {
+  const navigate = useNavigate();
+
   return (
     <Routes>
       {/* Public routes */}
@@ -78,8 +80,9 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <Editor 
-              onSave={() => console.log('Save action triggered')} 
-              onCancel={() => console.log('Cancel action triggered')} 
+              article={undefined} 
+              onSave={() => navigate('/dashboard')} 
+              onCancel={() => navigate('/dashboard')} 
             />
           </ProtectedRoute>
         } 

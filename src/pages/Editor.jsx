@@ -18,6 +18,7 @@ export default function Editor({ article = {}, onSave, onCancel }) {
   const navigate = useNavigate();
   const { fetchArticles } = useArticles();
 
+
   // Constants
   const MAX_TAG_LENGTH = 30;
 
@@ -51,11 +52,7 @@ export default function Editor({ article = {}, onSave, onCancel }) {
       await fetchArticles();
       
       // Use the onSave callback if provided, otherwise navigate
-      if (onSave) {
-        onSave(data);
-      } else {
-        navigate("/dashboard");
-      }
+      onSave(data);
       
       return data;
     } catch (error) {
@@ -86,11 +83,7 @@ export default function Editor({ article = {}, onSave, onCancel }) {
   };
 
   const handleCancel = () => {
-    if (onCancel) {
-      onCancel();
-    } else {
-      navigate("/dashboard");
-    }
+    onCancel();
   };
 
   const handleTagInputChange = (e) => {
