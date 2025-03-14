@@ -4,8 +4,11 @@ const uuid = require("uuid");
 const cookieParser = require("cookie-parser");
 const app = express();
 
+const port = process.argv.length > 2 ? process.argv[2] : 3000;
+
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.static('public'));
 
 users = [];
 
@@ -267,4 +270,4 @@ app.put("/api/articles/:title", async (req, res) => {
   }
 });
 
-app.listen(3000);
+app.listen(port);
