@@ -49,9 +49,9 @@ const Articles: React.FC<ArticlesProps> = ({
     }
   }, [location, fetchArticles, refreshOnMount]);
   
-  const handleDeleteArticle = async (title: string): Promise<void> => {
+  const handleDeleteArticle = async (id: string): Promise<void> => {
     try {
-      const response = await fetch(`/api/articles/${encodeURIComponent(title)}`, {
+      const response = await fetch(`/api/articles/${encodeURIComponent(id)}`, {
         method: "DELETE",
       });
       
@@ -101,7 +101,7 @@ const Articles: React.FC<ArticlesProps> = ({
     <Row xs={1} md={2} className="g-4 mt-2">
       {articles.map((article) => (
         <Col key={article.id || article.title}>
-          <Article article={article} onDelete={() => handleDeleteArticle(article.title)} />
+          <Article article={article} onDelete={() => handleDeleteArticle(article.id)} />
         </Col>
       ))}
     </Row>

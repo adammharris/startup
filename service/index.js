@@ -3,14 +3,13 @@ const bcrypt = require("bcryptjs");
 const uuid = require("uuid");
 const cookieParser = require("cookie-parser");
 const app = express();
+const DB = require("./database.js");
 
 const port = process.argv.length > 2 ? process.argv[2] : 3000;
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static('public'));
-
-users = [];
 
 async function createUser(username, password) {
   console.log("createUser: Creating user `"+username+"` with password `"+password+"`");
@@ -19,9 +18,11 @@ async function createUser(username, password) {
   const user = {
     username: username,
     passwordHash: passwordHash,
-    articles: [],
+    articles: [], // list of article IDs
+    id: uuid.v4(),
+    auth: null,
   };
-  users.push(user);
+  DB.addUser(user);
   return user;
 }
 
@@ -35,17 +36,27 @@ async function createAuth(res, user) {
   });
 }
 
-async function getUser(field, value) {
-  if (value) {
-    console.log("getUser: Searching for user with " + field + " = " + value);
-    return users.find((user) => user[field] === value);
+async function getUserByAuth(authToken) {
+  if (authToken) {
+    console.log("getUserByAuth: Searching for user with authToken = " + authToken);
+    return await DB.getUserByAuth(authToken);
+    //users.find((user) => user[field] === value);
   }
   return null;
 }
+
+async function getUserByUsername(username) {
+  if (username) {
+    console.log("getUserByUsername: Searching for user with username = " + username);
+    return await DB.getUserByUsername(username);
+  }
+  return null;
+}
+
 // registration
 app.post("/api/auth", async (req, res) => {
   console.log("registration: Recieved registration request: " + req.body.username);
-  if (await getUser("username", req.body.username)) {
+  if (await getUserByUsername(req.body.username)) {
     console.log("registration: Registration rejected because user already exists")
     res.status(409).send({ msg: "Existing user" });
   } else {
@@ -58,7 +69,7 @@ app.post("/api/auth", async (req, res) => {
 
 // login
 app.put("/api/auth", async (req, res) => {
-  const user = await getUser("username", req.body.username);
+  const user = await getUserByUsername(req.body.username);
   console.log("login: Recieved login request: " + req.body.username);
   // Check if user exists
   if (!user) {
@@ -87,10 +98,11 @@ app.put("/api/auth", async (req, res) => {
 // logout
 app.delete("/api/auth", async (req, res) => {
   const auth = req.cookies['auth'];
-  const user = await getUser("auth", auth);
+  const user = await getUserByAuth(auth);
   if (user) {
     console.log("logout: Logging out `"+user.username+"`");
-    delete user.auth;
+    DB.deleteUser(user.id);
+    //delete user.auth;
     res.clearCookie('auth')
   } else {
     console.log("logout: user not found, ignoring request")
@@ -102,7 +114,7 @@ app.delete("/api/auth", async (req, res) => {
 app.get("/api/user", async (req, res) => {
   console.log("getMe: Checking user");
   const auth = req.cookies['auth'];
-  const user = await getUser("auth", auth);
+  const user = await getUserByAuth(auth);
   if (user) {
     console.log("getMe: User found: " + user.username);
     res.send({ username: user.username });
@@ -113,11 +125,12 @@ app.get("/api/user", async (req, res) => {
 
 // get articles
 app.get("/api/articles", async (req, res) => {
-  console.log("get articles: Recieved request for articles");
   const auth = req.cookies['auth'];
-  const user = await getUser("auth", auth);
+  const user = await DB.getUserByAuth(auth);
+  console.log("get articles: Recieved request for articles for user "+ user.username);
   if (user) {
-    res.send(user.articles);
+    articles = await DB.getArticlesByUserId(user.id);
+    res.send(articles);
   } else {
     res.status(401).send({ msg: "Unauthorized" });
   }
@@ -125,6 +138,8 @@ app.get("/api/articles", async (req, res) => {
 
 // add article
 app.post("/api/articles", async (req, res) => {
+  const auth = req.cookies['auth'];
+  const user = await getUserByAuth(auth);
   const article = {
     id: uuid.v4(),
     content: req.body.content,
@@ -134,13 +149,13 @@ app.post("/api/articles", async (req, res) => {
       day: "numeric",
     }),
     tags: req.body.tags,
-    title: req.body.title
+    title: req.body.title,
+    userId: user.id,
   };
   console.log("add article: Recieved request to add article: " + article.title);
-  const auth = req.cookies['auth'];
-  const user = await getUser("auth", auth);
+  
   if (user) {
-    user.articles.push(article);
+    DB.addArticle(article);
     res.send({ msg: "Article added" });
   } else {
     console.log("add article: User not found, ignoring request");
@@ -149,26 +164,40 @@ app.post("/api/articles", async (req, res) => {
 });
 
 // delete article
-app.delete("/api/articles/:title", async (req, res) => {
-  const articleTitle = req.params.title;
+app.delete("/api/articles/:id", async (req, res) => {
+  const articleId = req.params.articleId;
   console.log("delete article: Recieved request to delete article: " + articleTitle);
   const auth = req.cookies['auth'];
   const user = await getUser("auth", auth);
-  if (user) {
-    user.articles = user.articles.filter(article => article.title !== articleTitle);
-    res.send({ msg: "Article deleted" });
-  } else {
-    console.log("delete article: User not found, ignoring request");
+
+  /*// Check if user is logged in
+  if (!auth || !user || user.auth != auth) {
+    console.log("delete article: User not logged in, ignoring request");
     res.status(401).send({ msg: "Unauthorized" });
+    return;
+  }*/
+
+  // Check if article exists for user
+  const article = DB.getArticleById(articleId);
+
+  if (!article || article.userId !== user.id) {
+    console.log("delete article: Article not found, ignoring request");
+    res.status(404).send({ msg: "Article not found" });
+    return;
   }
+
+  DB.deleteArticle(articleId);
+  res.send({ msg: "Article deleted" });
 });
 
 // add comment to article
-app.post("/api/comments/:title", async (req, res) => {
-  const articleTitle = req.params.title;
+app.post("/api/comments/:id", async (req, res) => {
+  const articleId = req.params.id;
   const {text} = req.body;
-  console.log("add comment: Recieved request to add comment to article: " + articleTitle);
+  console.log("add comment: Recieved request to add comment to article: " + articleId);
   const filteredText = await filterProfanity(text);
+  const auth = req.cookies['auth'];
+  const user = await DB.getUserByAuth(auth);
   const comment = {
     id: uuid.v4(),
     text: filteredText,
@@ -177,47 +206,31 @@ app.post("/api/comments/:title", async (req, res) => {
       month: "short",
       day: "numeric",
     }),
+    userId: user.id,
+    username: user.username,
+    articleId: articleId,
   };
   
-  const auth = req.cookies['auth'];
-  const user = await getUser("auth", auth);
-  if (user) {
-    const article = user.articles.find(article => article.title === articleTitle);
-    if (article) {
-      if (!article.comments) {
-        article.comments = [];
-      }
-      comment.username = user.username;
-      article.comments.unshift(comment);
-      res.send({ msg: "Comment added" });
-    } else {
-      console.log("add comment: Article not found, ignoring request");
-      res.status(404).send({ msg: "Article not found" });
-    }
-  } else {
-    console.log("add comment: User not found, ignoring request");
-    res.status(401).send({ msg: "Unauthorized" });
-  }
+  DB.addComment(comment);
+  //TODO: update user
 });
 
 // get comments
-app.get("/api/comments/:title", async (req, res) => {
-  const articleTitle = req.params.title;
-  console.log("get comments: Recieved request for comments on article: " + articleTitle);
-  const auth = req.cookies['auth'];
-  const user = await getUser("auth", auth);
-  if (user) {
-    const article = user.articles.find(article => article.title === articleTitle);
-    if (article) {
-      res.send(article.comments || []);
-    } else {
-      console.log("get comments: Article not found, ignoring request");
-      res.status(404).send({ msg: "Article not found" });
-    }
-  } else {
-    console.log("get comments: User not found, ignoring request");
-    res.status(401).send({ msg: "Unauthorized" });
+app.get("/api/comments/:articleId", async (req, res) => {
+  const articleId = req.params.articleId;
+  console.log("get comments: Recieved request for comments on article: " + articleId);
+  const article = await DB.getArticleById(articleId);
+  if (!article) {
+    console.log("get comments: Article not found");
+    res.status(404).send({ msg: "Article not found" });
+    return;
   }
+  const comments = await DB.getCommentByArticleId(articleId);
+  if (!comments) {
+    res.send([]);
+    return;
+  }
+  res.send(comments);
 });
 
 async function filterProfanity(text) {
@@ -241,29 +254,17 @@ async function filterProfanity(text) {
 }
 
 // Update article
-app.put("/api/articles/:title", async (req, res) => {
-  const articleTitle = req.params.title;
-  console.log("update article: Received request to update article:", articleTitle);
+app.put("/api/articles/:id", async (req, res) => {
+  const articleId = req.params.id;
+  console.log("update article: Received request to update article:", articleId);
   
   const auth = req.cookies['auth'];
   const user = await getUser("auth", auth);
   
   if (user) {
-    const articleIndex = user.articles.findIndex(a => a.title === articleTitle);
-    
-    if (articleIndex !== -1) {
-      // Keep the existing ID but update other properties
-      const articleId = user.articles[articleIndex].id;
-      user.articles[articleIndex] = {
-        ...req.body,
-        id: articleId
-      };
+      DB.setArticle(articleId, req.body);
       
       res.send({ msg: "Article updated" });
-    } else {
-      console.log("update article: Article not found");
-      res.status(404).send({ msg: "Article not found" });
-    }
   } else {
     console.log("update article: User not found, ignoring request");
     res.status(401).send({ msg: "Unauthorized" });

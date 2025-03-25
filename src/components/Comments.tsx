@@ -14,11 +14,11 @@ interface CommentType {
 
 interface CommentsProps {
   accordionKey?: string;
-  articleTitle: string;
+  articleId: string;
   isVisible?: boolean;
 }
 
-const Comments: React.FC<CommentsProps> = ({ accordionKey = "0", articleTitle, isVisible = false }) => {
+const Comments: React.FC<CommentsProps> = ({ accordionKey = "0", articleId, isVisible = false }) => {
   const [comments, setComments] = useState<CommentType[]>([]);
   const [newComment, setNewComment] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -27,13 +27,13 @@ const Comments: React.FC<CommentsProps> = ({ accordionKey = "0", articleTitle, i
   const { username } = useAuth(); // Add this line to get the current username
 
   const fetchComments = async () => {
-    if (!articleTitle) return;
+    if (!articleId) return;
     
     setIsLoading(true);
     setError(null);
     
     try {
-      const encodedTitle = encodeURIComponent(articleTitle);
+      const encodedTitle = encodeURIComponent(articleId);
       const response = await fetch(`/api/comments/${encodedTitle}`);
       
       if (!response.ok) {
@@ -54,7 +54,7 @@ const Comments: React.FC<CommentsProps> = ({ accordionKey = "0", articleTitle, i
   // Fetch comments when component mounts or article title changes
   useEffect(() => {
     fetchComments();
-  }, [articleTitle]);
+  }, [articleId]);
 
   // Fetch comments when the component is visible
   useEffect(() => {
@@ -96,7 +96,7 @@ const Comments: React.FC<CommentsProps> = ({ accordionKey = "0", articleTitle, i
     setComments(prevComments => [newCommentObj, ...prevComments]);
 
     try {
-      const encodedTitle = encodeURIComponent(articleTitle);
+      const encodedTitle = encodeURIComponent(articleId);
       const response = await fetch(`/api/comments/${encodedTitle}`, {
         method: "POST",
         headers: {

@@ -78,13 +78,9 @@ const Article: React.FC<ArticleProps> = ({ article, onDelete }) => {
   };
 
   const handleDelete = (): void => {
-    // Update localStorage
     try {
-      const savedArticles = JSON.parse(
-        localStorage.getItem("articles") || "[]"
-      );
-      const updatedArticles = savedArticles.filter((a: ArticleType) => a.id !== article.id);
-      localStorage.setItem("articles", JSON.stringify(updatedArticles));
+      // TODO: not localStorage
+
       // Close modals
       setShowDeleteConfirm(false);
       setShowModal(false);
@@ -198,7 +194,7 @@ const Article: React.FC<ArticleProps> = ({ article, onDelete }) => {
           <Stack direction="horizontal" className="w-100" gap={3}>
             <Comments 
               accordionKey={`comments-${article.id}`}
-              articleTitle={article.title}
+              articleId={article.id}
               isVisible = {showModal}
             />
             <Button
