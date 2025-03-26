@@ -51,7 +51,7 @@ async function getCommentByArticleId(articleId) {
 function setUser(userId, user) {
     return userCollection.updateOne(
         {
-            _id: userId,
+            id: userId,
         },
         {
             $set: user,
@@ -72,7 +72,7 @@ async function setUserAuth(userId, auth) {
 function setArticle(articleId, article) {
     return articleCollection.updateOne(
         {
-            _id: articleId,
+            id: articleId,
         },
         {
             $set: article,
@@ -81,20 +81,16 @@ function setArticle(articleId, article) {
 }
 
 function deleteUser(userId) {
-    return userCollection.deleteOne({ _id: userId });
+    return userCollection.deleteOne({ id: userId });
 }
-function deleteUserAuth(userId) {
+async function deleteUserAuth(userId) {
     return userCollection.updateOne(
-        {
-            _id: userId,
-        },
-        {
-            $unset: { auth: "" },
-        }
+        { id: userId, },
+        { $unset: { auth: "" } }
     );
 }
-function deleteArticle(articleId) {
-    return articleCollection.deleteOne({ _id: articleId });
+async function deleteArticle(articleId) {
+    return articleCollection.deleteOne({ id: articleId });
 }
 
 module.exports = {

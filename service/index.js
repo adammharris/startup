@@ -85,9 +85,8 @@ app.delete("/api/auth", async (req, res) => {
   const user = await DB.getUserByAuth(auth);
   if (user) {
     console.log("logout: Logging out `"+user.username+"`");
-    DB.deleteUserAuth(user.id);
-    //delete user.auth;
-    res.clearCookie('auth')
+    await DB.deleteUserAuth(user.id);
+    res.clearCookie('auth', { path: '/' });
   } else {
     console.log("logout: user not found, ignoring request")
   }
@@ -98,6 +97,11 @@ app.delete("/api/auth", async (req, res) => {
 app.get("/api/user", async (req, res) => {
   console.log("getMe: Checking user");
   const auth = req.cookies['auth'];
+  if (!auth) {
+    console.log("getMe: No auth cookie found");
+    res.status(401).send({ msg: "Unauthorized" });
+    return;
+  }
   const user = await DB.getUserByAuth(auth);
   if (user) {
     console.log("getMe: User found: " + user.username);
@@ -150,20 +154,20 @@ app.post("/api/articles", async (req, res) => {
 
 // delete article
 app.delete("/api/articles/:id", async (req, res) => {
-  const articleId = req.params.articleId;
-  console.log("delete article: Recieved request to delete article: " + articleTitle);
+  const articleId = req.params.id;
+  console.log("delete article: Recieved request to delete article: " + articleId);
   const auth = req.cookies['auth'];
-  const user = await getUser("auth", auth);
+  const user = await DB.getUserByAuth(auth);
 
-  /*// Check if user is logged in
+  // Check if user is logged in
   if (!auth || !user || user.auth != auth) {
     console.log("delete article: User not logged in, ignoring request");
     res.status(401).send({ msg: "Unauthorized" });
     return;
-  }*/
+  }
 
   // Check if article exists for user
-  const article = DB.getArticleById(articleId);
+  const article = await DB.getArticleById(articleId);
 
   if (!article || article.userId !== user.id) {
     console.log("delete article: Article not found, ignoring request");
@@ -171,7 +175,7 @@ app.delete("/api/articles/:id", async (req, res) => {
     return;
   }
 
-  DB.deleteArticle(articleId);
+  await DB.deleteArticle(articleId);
   res.send({ msg: "Article deleted" });
 });
 

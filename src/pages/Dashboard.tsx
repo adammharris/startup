@@ -10,7 +10,7 @@ import Spinner from "react-bootstrap/Spinner";
 import { useEffect } from "react";
 
 const Dashboard: React.FC = () => {
-  const { loading, username, checkAuthStatus } = useAuth();
+  const { loading, username, checkAuthStatus, logout } = useAuth();
   const navigate = useNavigate();
   
   if (loading) {
@@ -27,21 +27,6 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     console.log("Dashboard component loaded with username:", username);
   }, [loading, username, checkAuthStatus]);
-
-  const logout = async (): Promise<void> => {
-    try {
-      const response = await fetch("/api/auth", {
-        method: "DELETE",
-      });
-      if (response.ok) {
-        navigate("/");
-      } else {
-        console.error("Logout failed");
-      }
-    } catch (error) {
-      console.error("Error during logout:", error);
-    }
-  };
   
   return (
     <Container className="text-dark p-5">

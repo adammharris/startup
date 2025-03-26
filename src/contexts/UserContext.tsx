@@ -21,6 +21,7 @@ interface UserContextType {
   articles: Article[];
   fetchArticles: () => Promise<void>;
   articlesLoading: boolean;
+  logout: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -55,6 +56,23 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  const logout = useCallback(async () => {
+    try {
+      // Tell the server to clear the auth token
+      await fetch("/api/auth", {
+        method: "DELETE",
+        credentials: "include",
+      });
+    } catch (error) {
+      console.error("Error during logout:", error);
+    } finally {
+      // Reset state
+      setLoggedIn(false);
+      setUsername(null);
+      setArticles([]);
+    }
+  }, []);
+
   // Articles methods
   const fetchArticles = useCallback(async () => {
     setArticlesLoading(true);
@@ -62,6 +80,12 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       const response = await fetch("/api/articles", {
         method: "GET",
       });
+      if (response.status === 401) {
+        setLoggedIn(false);
+        setUsername(null);
+        setArticles([]);
+        return;
+      }
       if (!response.ok) {
         throw new Error(`Failed to fetch articles: ${response.status}`);
       }
@@ -89,14 +113,15 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       value={{ 
         // Auth
         loggedIn, 
-        setLoggedIn, // Add this line
+        setLoggedIn,
         authLoading, 
         checkAuthStatus,
         // Articles
         articles, 
         fetchArticles, 
         articlesLoading: articlesLoading,
-        username
+        username,
+        logout,
       }}
     >
       {children}
@@ -114,8 +139,8 @@ export const useUser = () => {
 
 // For backward compatibility or more focused use
 export const useAuth = () => {
-  const { loggedIn, setLoggedIn, authLoading, checkAuthStatus, username } = useUser();
-  return { loggedIn, setLoggedIn, loading: authLoading, checkAuthStatus, username };
+  const { loggedIn, setLoggedIn, authLoading, checkAuthStatus, username, logout } = useUser();
+  return { loggedIn, setLoggedIn, loading: authLoading, checkAuthStatus, username, logout };
 };
 
 export const useArticles = () => {
