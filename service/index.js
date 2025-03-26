@@ -28,35 +28,19 @@ async function createUser(username, password) {
 
 async function createAuth(res, user) {
   console.log("createAuth: logging in `"+ user.username + "`");
-  user.auth = uuid.v4();
-  res.cookie('auth', user.auth, {
+  const auth = uuid.v4();
+  DB.setUserAuth(user.id, auth);
+  res.cookie('auth', auth, {
     secure: true,
     httpOnly: true,
     sameSite: 'strict',
   });
 }
 
-async function getUserByAuth(authToken) {
-  if (authToken) {
-    console.log("getUserByAuth: Searching for user with authToken = " + authToken);
-    return await DB.getUserByAuth(authToken);
-    //users.find((user) => user[field] === value);
-  }
-  return null;
-}
-
-async function getUserByUsername(username) {
-  if (username) {
-    console.log("getUserByUsername: Searching for user with username = " + username);
-    return await DB.getUserByUsername(username);
-  }
-  return null;
-}
-
 // registration
 app.post("/api/auth", async (req, res) => {
   console.log("registration: Recieved registration request: " + req.body.username);
-  if (await getUserByUsername(req.body.username)) {
+  if (await DB.getUserByUsername(req.body.username)) {
     console.log("registration: Registration rejected because user already exists")
     res.status(409).send({ msg: "Existing user" });
   } else {
@@ -69,7 +53,7 @@ app.post("/api/auth", async (req, res) => {
 
 // login
 app.put("/api/auth", async (req, res) => {
-  const user = await getUserByUsername(req.body.username);
+  const user = await DB.getUserByUsername(req.body.username);
   console.log("login: Recieved login request: " + req.body.username);
   // Check if user exists
   if (!user) {
@@ -91,17 +75,17 @@ app.put("/api/auth", async (req, res) => {
     return;
   }
   console.log("login: Login accepted")
-  createAuth(res, user);
+  await createAuth(res, user);
   res.send({ username: user.username });
 });
 
 // logout
 app.delete("/api/auth", async (req, res) => {
   const auth = req.cookies['auth'];
-  const user = await getUserByAuth(auth);
+  const user = await DB.getUserByAuth(auth);
   if (user) {
     console.log("logout: Logging out `"+user.username+"`");
-    DB.deleteUser(user.id);
+    DB.deleteUserAuth(user.id);
     //delete user.auth;
     res.clearCookie('auth')
   } else {
@@ -114,7 +98,7 @@ app.delete("/api/auth", async (req, res) => {
 app.get("/api/user", async (req, res) => {
   console.log("getMe: Checking user");
   const auth = req.cookies['auth'];
-  const user = await getUserByAuth(auth);
+  const user = await DB.getUserByAuth(auth);
   if (user) {
     console.log("getMe: User found: " + user.username);
     res.send({ username: user.username });
@@ -127,8 +111,9 @@ app.get("/api/user", async (req, res) => {
 app.get("/api/articles", async (req, res) => {
   const auth = req.cookies['auth'];
   const user = await DB.getUserByAuth(auth);
-  console.log("get articles: Recieved request for articles for user "+ user.username);
+  
   if (user) {
+    console.log("get articles: Recieved request for articles for user "+ user.username);
     articles = await DB.getArticlesByUserId(user.id);
     res.send(articles);
   } else {
@@ -139,7 +124,7 @@ app.get("/api/articles", async (req, res) => {
 // add article
 app.post("/api/articles", async (req, res) => {
   const auth = req.cookies['auth'];
-  const user = await getUserByAuth(auth);
+  const user = await DB.getUserByAuth(auth);
   const article = {
     id: uuid.v4(),
     content: req.body.content,

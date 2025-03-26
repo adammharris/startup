@@ -43,12 +43,7 @@ async function getArticleById(id) {
 async function getArticlesByUserId(userId) {
     return articleCollection.find({ userId: userId }).toArray();
 }
-async function getArticleByUserTitle(userId, title) {
-    return articleCollection.findOne({
-        userId: userId,
-        title: title,
-    });
-}
+
 async function getCommentByArticleId(articleId) {
     return commentCollection.find({ articleId: articleId }).toArray();
 }
@@ -60,6 +55,17 @@ function setUser(userId, user) {
         },
         {
             $set: user,
+        }
+    );
+}
+
+async function setUserAuth(userId, auth) {
+    return await userCollection.updateOne(
+        {
+            id: userId,
+        },
+        {
+            $set: { auth: auth },
         }
     );
 }
@@ -77,6 +83,16 @@ function setArticle(articleId, article) {
 function deleteUser(userId) {
     return userCollection.deleteOne({ _id: userId });
 }
+function deleteUserAuth(userId) {
+    return userCollection.updateOne(
+        {
+            _id: userId,
+        },
+        {
+            $unset: { auth: "" },
+        }
+    );
+}
 function deleteArticle(articleId) {
     return articleCollection.deleteOne({ _id: articleId });
 }
@@ -91,7 +107,9 @@ module.exports = {
     getArticlesByUserId,
     getCommentByArticleId,
     setUser,
+    setUserAuth,
     setArticle,
     deleteUser,
+    deleteUserAuth,
     deleteArticle,
 };
