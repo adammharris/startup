@@ -10,6 +10,7 @@ interface CommentType {
   id: number;
   text: string;
   date: string;
+  articleId: string;
 }
 
 interface CommentsProps {
@@ -25,6 +26,44 @@ const Comments: React.FC<CommentsProps> = ({ accordionKey = "0", articleId, isVi
   const [error, setError] = useState<string | null>(null);
   const commentsContainerRef = useRef<HTMLDivElement | null>(null);
   const { username } = useAuth(); // Add this line to get the current username
+  
+  // Store the ws instance in a ref
+  const wsRef = useRef<WebSocket | null>(null);
+
+  // Create the WebSocket connection
+  useEffect(() => {
+    const ws = new WebSocket("ws://localhost:3000");
+    wsRef.current = ws;
+  
+    ws.onopen = () => {
+      console.log("WebSocket client: Connected in Comments component");
+    };
+  
+    ws.onmessage = (event) => {
+      try {
+        const incoming = JSON.parse(event.data);
+        // Check if the message is for the current article
+        if (incoming.articleId === articleId) {
+          console.log("WebSocket client: Received new comment:", incoming);
+          // Add the new comment to the current list
+          setComments(prevComments => [incoming, ...prevComments]);
+        }
+      } catch (error) {
+        console.error("WebSocket client: Failed to parse message", error);
+      }
+    };
+  
+    ws.onerror = (error) => {
+      console.error("WebSocket client: Error occurred", error);
+    };
+  
+    ws.onclose = () => {
+      console.log("WebSocket client: Disconnected in Comments component");
+    };
+  
+    // Clean up the connection on unmount
+    return () => ws.close();
+  }, [articleId]);
 
   const fetchComments = async () => {
     if (!articleId) return;
@@ -72,41 +111,6 @@ const Comments: React.FC<CommentsProps> = ({ accordionKey = "0", articleId, isVi
     }
   }, [comments]);
 
-  // WebSocket connection for live comment updates
-  useEffect(() => {
-    // Connect to the unsecured WS server (adjust URL if necessary)
-    const ws = new WebSocket("ws://localhost:3000");
-  
-    ws.onopen = () => {
-      console.log("WebSocket client: Connected in Comments component");
-    };
-  
-    ws.onmessage = (event) => {
-      try {
-        const incoming = JSON.parse(event.data);
-        // Check if the message is for the current article
-        if (incoming.articleId === articleId) {
-          console.log("WebSocket client: Received new comment:", incoming);
-          // Add the new comment to the current list
-          setComments(prevComments => [incoming, ...prevComments]);
-        }
-      } catch (error) {
-        console.error("WebSocket client: Failed to parse message", error);
-      }
-    };
-  
-    ws.onerror = (error) => {
-      console.error("WebSocket client: Error occurred", error);
-    };
-  
-    ws.onclose = () => {
-      console.log("WebSocket client: Disconnected in Comments component");
-    };
-  
-    // Clean up the connection on unmount
-    return () => ws.close();
-  }, [articleId]);
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     if (!newComment.trim()) return;
@@ -119,6 +123,7 @@ const Comments: React.FC<CommentsProps> = ({ accordionKey = "0", articleId, isVi
       date: new Date().toISOString(),
       id: Date.now(),
       text: newComment,
+      articleId: articleId,
     };
 
     // Cache the comment text in case we need to restore it after an error
@@ -130,45 +135,13 @@ const Comments: React.FC<CommentsProps> = ({ accordionKey = "0", articleId, isVi
     // Add the new comment to the list optimistically
     setComments(prevComments => [newCommentObj, ...prevComments]);
 
-    try {
-      const encodedTitle = encodeURIComponent(articleId);
-      const response = await fetch(`/api/comments/${encodedTitle}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newCommentObj),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Error posting comment: ${response.status}`);
-      }
-      
-      const returnedComment = await response.json();
-      
-      // Only update if we got a valid response with required fields
-      if (returnedComment && returnedComment.text && returnedComment.username) {
-        // Update the comment with server response
-        setComments(prevComments =>
-          prevComments.map(comment =>
-            comment.id === newCommentObj.id ? returnedComment : comment
-          )
-        );
-        console.log("Comment updated with server response:", returnedComment);
-      } else {
-        console.error("Invalid comment response from server:", returnedComment);
-      }
-    } catch (err) {
-      console.error("Failed to post comment:", err);
-      
-      // Remove the failed comment
-      setComments(prevComments => prevComments.filter(c => c.id !== newCommentObj.id));
-      
-      // Show error to user
-      setError("Failed to post comment. Please try again.");
-      
-      // Restore the comment text to the input so the user doesn't lose their work
-      setNewComment(commentText);
+    // Send the new comment over WebSocket
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify(newCommentObj));
+      console.log("Comment sent over websocket:", newCommentObj);
+    } else {
+      console.error("WebSocket is not open. Comment not sent.");
+      // Optionally: you can fall back to the fetch POST request here if needed.
     }
   };
 
