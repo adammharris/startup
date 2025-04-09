@@ -279,13 +279,13 @@ async function filterProfanity(text) {
 // Update article
 app.put("/api/articles/:id", async (req, res) => {
   const articleId = req.params.id;
-  console.log("update article: Received request to update article:", articleId);
+  console.log("update article: Received request to update article:", articleId,req.body);
   
   const auth = req.cookies['auth'];
-  const user = await getUser("auth", auth);
+  const user = await DB.getUserByAuth(auth);
   
   if (user) {
-      DB.setArticle(articleId, req.body);
+      await DB.setArticle(articleId, req.body);
       
       res.send({ msg: "Article updated" });
   } else {

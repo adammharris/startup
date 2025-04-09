@@ -66,20 +66,76 @@ export default function Editor({ article = {}, onSave, onCancel }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const newArticle = {
-      ...article,
-      title,
-      content,
-      tags,
-      date: new Date().toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      }),
-    };
-    
-    await saveArticle(newArticle);
-    navigate("/dashboard");
+
+    // If updating an existing article, compute only the fields that changed.
+    let updateData = {};
+    if (article.id) {
+      if (article.title !== title) updateData.title = title;
+      if (article.content !== content) updateData.content = content;
+      if (JSON.stringify(article.tags) !== JSON.stringify(tags)) {
+        updateData.tags = tags;
+      }
+      // Always update the date if any changes have been made.
+      if (Object.keys(updateData).length > 0) {
+        updateData.date = new Date().toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        });
+      }
+    } else {
+      // Creating new articles requires sending all necessary fields.
+      updateData = {
+        title,
+        content,
+        tags,
+        date: new Date().toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        }),
+      };
+    }
+
+    try {
+      // If no changes were detected, you can either alert the user or skip calling the backend.
+      if (article.id && Object.keys(updateData).length === 0) {
+        alert("No changes to update");
+        return;
+      }
+
+      setSaving(true);
+      // Choose PATCH for updates (if your backend supports it) or still use PUT.
+      const isUpdate = !!article.id;
+      const url = isUpdate 
+        ? `/api/articles/${encodeURIComponent(article.id)}` 
+        : "/api/articles"; // Create a new article
+
+      const method = isUpdate ? "PUT" : "POST";
+      
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updateData),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to save article: ${response.status} ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log("Article saved:", data);
+      await fetchArticles(); // Refresh local articles
+      onSave(data);
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Error saving article:", error);
+      alert("Failed to save article. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCancel = () => {

@@ -69,7 +69,7 @@ async function setUserAuth(userId, auth) {
         }
     );
 }
-function setArticle(articleId, article) {
+async function setArticle(articleId, article) {
     return articleCollection.updateOne(
         {
             id: articleId,
