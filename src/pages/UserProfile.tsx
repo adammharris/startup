@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/UserContext';
 import Article from '../components/Article';
 
@@ -15,7 +15,10 @@ const UserProfile: React.FC = () => {
   const { loggedIn, username } = useAuth();
   const isOwnProfile = loggedIn && username === username_uri;
   const [posts, setPosts] = useState<Post[]>([]);
-
+  const navigate = useNavigate();
+  if (isOwnProfile) {
+    navigate("/dashboard");
+  }
   useEffect(() => {
     async function fetchPosts() {
       try {
