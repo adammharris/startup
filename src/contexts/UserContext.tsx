@@ -76,8 +76,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   // Articles methods
   const fetchArticles = useCallback(async () => {
     setArticlesLoading(true);
+    if (!username) return;
     try {
-      const response = await fetch("/api/articles", {
+      const response = await fetch(`/api/articles/${encodeURIComponent(username)}`, {
         method: "GET",
       });
       if (response.status === 401) {
@@ -96,7 +97,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setArticlesLoading(false);
     }
-  }, []);
+  }, [username]);
 
   // Check auth status when location changes
   useEffect(() => {

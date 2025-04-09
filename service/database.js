@@ -93,6 +93,25 @@ async function deleteArticle(articleId) {
     return articleCollection.deleteOne({ id: articleId });
 }
 
+async function getArticlesByUserIdAndTags(userId, viewerTags) {
+    const articles = await articleCollection.find({
+        userId: userId,
+        tags: { $elemMatch: { $in: [...viewerTags, "public"] } },
+    }).toArray();
+
+    return articles;
+}
+
+async function getTagsByUserIdAndViewerId(userId, viewerId) {
+    const user = await userCollection.findOne({ id: userId });
+    if (!user || !user.relationships) {
+        return [];
+    }
+
+    const relationship = user.relationships.find(rel => rel.id === viewerId);
+    const tags = relationship ? relationship.tags : [];
+    return Array.isArray(tags) ? tags : [tags];
+}
 module.exports = {
     addUser,
     addArticle,
@@ -108,4 +127,6 @@ module.exports = {
     deleteUser,
     deleteUserAuth,
     deleteArticle,
+    getArticlesByUserIdAndTags,
+    getTagsByUserIdAndViewerId
 };

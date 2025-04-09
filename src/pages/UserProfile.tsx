@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/UserContext';
+import Article from '../components/Article';
 
 interface Post {
   id: string;
@@ -10,7 +11,7 @@ interface Post {
 }
 
 const UserProfile: React.FC = () => {
-  const { username_uri } = useParams<{ username: string }>();
+  const { username_uri } = useParams<{ username_uri: string }>();
   const { loggedIn, username } = useAuth();
   const isOwnProfile = loggedIn && username === username_uri;
   const [posts, setPosts] = useState<Post[]>([]);
@@ -18,23 +19,24 @@ const UserProfile: React.FC = () => {
   useEffect(() => {
     async function fetchPosts() {
       try {
-        const response = await fetch(`/api/posts/${username}`);
+        const response = await fetch(`/api/articles/${username_uri}`);
         if (response.ok) {
           const data = await response.json();
           setPosts(data);
         } else {
-          console.error("Error fetching posts for user:", username);
+          console.error("Error fetching posts for user:", username_uri);
         }
       } catch (error) {
         console.error("Failed to fetch posts", error);
       }
     }
     fetchPosts();
-  }, [username]);
+  }, [username_uri]);
 
   return (
     <div className="container mt-3">
-      <h1>{username}'s Profile</h1>
+      <h1>{username_uri}'s Profile</h1>
+      <p>(viewing as {username})</p>
       {isOwnProfile && (
         <div>
           <button type="button">New Post</button>
@@ -44,10 +46,7 @@ const UserProfile: React.FC = () => {
       <div>
         {posts.length > 0 ? (
           posts.map(post => (
-            <div key={post.id}>
-              <h3>{post.title}</h3>
-              <p>{post.content}</p>
-            </div>
+            <Article key={post.id} article={post} />
           ))
         ) : (
           <p>No posts found.</p>

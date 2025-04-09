@@ -4,7 +4,6 @@ const uuid = require("uuid");
 const cookieParser = require("cookie-parser");
 const app = express();
 const DB = require("./database.js");
-const websocketServer = require("./websocket.js");
 const initWebSocketServer = require("./websocket.js");
 
 const port = process.argv.length > 2 ? process.argv[2] : 3000;
@@ -23,6 +22,7 @@ async function createUser(username, password) {
     articles: [], // list of article IDs
     id: uuid.v4(),
     auth: null,
+    tags: [], // list of tags
   };
   DB.addUser(user);
   return user;
@@ -114,16 +114,47 @@ app.get("/api/user", async (req, res) => {
 });
 
 // get articles
-app.get("/api/articles", async (req, res) => {
+app.get("/api/articles/:username", async (req, res) => {
   const auth = req.cookies['auth'];
-  const user = await DB.getUserByAuth(auth);
+  const username = req.params.username;
+
+  // Handle case where username is not found in database
+  let user = await DB.getUserByUsername(username);
+  if (!user) {
+    console.log("get articles: User not found");
+    res.status(404).send({ msg: "User not found" });
+    return;
+  }
+
+  // Work whether user is logged in or not
+  let viewer = {
+    id: -1,
+    tags: [],
+  };
+  if (auth) {
+    potential_viewer = await DB.getUserByAuth(auth);
+    if (potential_viewer) {
+      viewer.id = potential_viewer.id;
+      viewer.tags = potential_viewer.tags;
+    }
+  }
   
-  if (user) {
-    console.log("get articles: Recieved request for articles for user "+ user.username);
-    articles = await DB.getArticlesByUserId(user.id);
+  // Check if viewer is viewing their own or someone else's profile
+  if (viewer.id == user.id) {
+    console.log("get articles: Recieved request for own articles");
+    const articles = await DB.getArticlesByUserId(user.id);
     res.send(articles);
   } else {
-    res.status(401).send({ msg: "Unauthorized" });
+    console.log("get articles: Recieved request for public articles of user `"+user.username+"`");
+    // TODO: find tags for viewer based on user's assignments.
+    const tags = await DB.getTagsByUserIdAndViewerId(user.id, viewer.id);
+    if (!tags) {
+      viewer.tags = [];
+    } else {
+    viewer.tags = tags;
+    }
+    const articles = await DB.getArticlesByUserIdAndTags(user.id, viewer.tags);
+    res.send(articles);
   }
 });
 
