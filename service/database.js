@@ -104,11 +104,12 @@ async function getArticlesByUserIdAndTags(userId, viewerTags) {
 
 async function getTagsByUserIdAndViewerId(userId, viewerId) {
     const user = await userCollection.findOne({ id: userId });
+    const viewer = await userCollection.findOne({ id: viewerId });
     if (!user || !user.relationships) {
         return [];
     }
 
-    const relationship = user.relationships.find(rel => rel.id === viewerId);
+    const relationship = user.relationships.find(rel => rel.username === viewer.username);
     const tags = relationship ? relationship.tags : [];
     return Array.isArray(tags) ? tags : [tags];
 }

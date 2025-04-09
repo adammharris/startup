@@ -11,6 +11,7 @@ import Help from '../pages/Help.tsx';
 import NotFound from '../pages/NotFound.tsx';
 import Editor from '../pages/Editor.jsx';
 import UserProfile from '../pages/UserProfile.tsx';
+import UserRelationships from '../pages/UserRelationships.tsx';
 
 // Protected route component
 interface ProtectedRouteProps {
@@ -96,6 +97,15 @@ const AppRoutes = () => {
             <EditArticle />
           </ProtectedRoute>
         } 
+      />
+
+      <Route
+        path="/relationships"
+        element={
+          <ProtectedRoute>
+            <UserRelationships />
+          </ProtectedRoute>
+        }
       />
       
       <Route path="/:username_uri" element={<UserProfile />} />

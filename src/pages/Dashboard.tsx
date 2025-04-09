@@ -59,6 +59,13 @@ const Dashboard: React.FC = () => {
         </Card>
         <WeatherWidget />
       </Stack>
+      <Card className="p-3">
+        <h2>My Relationships</h2>
+        <p>Manage your relationships</p>
+        <Button variant="primary" onClick={() => navigate("/relationships")}>
+          Manage Relationships
+        </Button>
+      </Card>
       
       <Articles />
     </Container>

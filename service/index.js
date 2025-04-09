@@ -23,6 +23,7 @@ async function createUser(username, password) {
     id: uuid.v4(),
     auth: null,
     tags: [], // list of tags
+    relationships: []
   };
   DB.addUser(user);
   return user;
@@ -292,6 +293,79 @@ app.put("/api/articles/:id", async (req, res) => {
     res.status(401).send({ msg: "Unauthorized" });
   }
 });
+
+app.put("/api/user/relationships", async (req, res) => {
+  const auth = req.cookies['auth'];
+  const user = await DB.getUserByAuth(auth);
+  const { tag, username } = req.body;
+  // Add tag to user in relationships
+  const existingRelationship = user.relationships.find(rel => rel.username === username);
+  if (existingRelationship) {
+    if (!existingRelationship.tags.includes(tag)) {
+      console.log("update relationships: Adding tag to existing relationship");
+      existingRelationship.tags.push(tag);
+    }
+    console.log("update relationships: Ignoring request to add tag to existing relationship");
+  } else if (user.username === username) {
+    console.log("update relationships: Ignoring request to add tag to self");
+    res.status(400).send({ msg: "Cannot add tag to self" });
+  } else {
+    console.log("update relationships: Creating new relationship");
+    user.relationships.push({
+      username: username,
+      tags: [tag],
+    });
+  }
+  DB.setUser(user.id, user);
+  res.send({ msg: "Relationship updated" });
+});
+
+app.get("/api/user/relationships", async (req, res) => {
+  const auth = req.cookies['auth'];
+  const user = await DB.getUserByAuth(auth);
+  if (user) {
+    console.log("get relationships: Recieved request for user relationships");
+    res.send(user.relationships);
+  } else {
+    console.log("get relationships: User not found, ignoring request");
+    res.status(401).send({ msg: "Unauthorized" });
+  }
+});
+
+app.delete("/api/user/relationships", async (req, res) => {
+  const auth = req.cookies['auth'];
+  const user = await DB.getUserByAuth(auth);
+  const { username } = req.body;
+  if (user) {
+    console.log("delete relationships: Recieved request to delete relationship with user: " + username);
+    user.relationships = user.relationships.filter(rel => rel.username !== username);
+    DB.setUser(user.id, user);
+    res.send({ msg: "Relationship deleted" });
+  } else {
+    console.log("delete relationships: User not found, ignoring request");
+    res.status(401).send({ msg: "Unauthorized" });
+  }
+}
+);
+
+// delete a single tag from a relationship
+app.delete("/api/user/relationships/:tag", async (req, res) => {
+  const auth = req.cookies['auth'];
+  const user = await DB.getUserByAuth(auth);
+  const tag = req.params.tag;
+  if (user) {
+    console.log("delete relationships: Recieved request to delete tag: " + tag);
+    user.relationships.forEach(rel => {
+      rel.tags = rel.tags.filter(t => t !== tag);
+    });
+    DB.setUser(user.id, user);
+    res.send({ msg: "Tag deleted" });
+  } else {
+    console.log("delete relationships: User not found, ignoring request");
+    res.status(401).send({ msg: "Unauthorized" });
+  }
+}
+);
 
 const httpService = app.listen(port, () => {
   console.log(`Listening on port ${port}`);
