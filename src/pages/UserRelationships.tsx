@@ -38,43 +38,80 @@ const UserRelationships: React.FC = () => {
     }
   }, [loggedIn]);
 
+  // Optimistic update version of handleAddTag:
   const handleAddTag = async () => {
-    if (!selectedUsername.trim() || !newTag.trim()) return; // ensure inputs
+    if (!selectedUsername.trim() || !newTag.trim()) return;
+  
+    // Capture the current values
+    const targetUsername = selectedUsername.trim();
+    const tagValue = newTag.trim();
+  
+    // Check for an existing relationship in state (case-insensitive)
+    const existingIndex = relationships.findIndex(
+      (rel) => rel.username.toLowerCase() === targetUsername.toLowerCase()
+    );
+  
+    // Prepare the optimistic update using the captured values
+    let optimisticallyUpdated: Relationship;
+    if (existingIndex !== -1) {
+      optimisticallyUpdated = {
+        ...relationships[existingIndex],
+        tags: [...relationships[existingIndex].tags, tagValue],
+      };
+    } else {
+      optimisticallyUpdated = {
+        id: Date.now().toString(), // temporary id; backend should return a real id
+        username: targetUsername,
+        tags: [tagValue],
+      };
+    }
+  
+    // Immediately update the UI
+    setRelationships((prev) => {
+      if (existingIndex !== -1) {
+        const newRels = [...prev];
+        newRels[existingIndex] = optimisticallyUpdated;
+        return newRels;
+      } else {
+        return [...prev, optimisticallyUpdated];
+      }
+    });
+  
+    // Clear the inputs AFTER capturing the values
+    setNewTag("");
+    setSelectedUsername("");
+  
+    // Now call the API, using the captured values
     try {
       const response = await fetch("/api/user/relationships", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        // Pass both targetUsername and tag; adjust to match your backend expectations
-        body: JSON.stringify({ username: selectedUsername, tag: newTag}), 
+        body: JSON.stringify({ username: targetUsername, tag: tagValue }),
       });
-
+  
       if (response.ok) {
-        // Expecting the API to return the updated relationship for targetUsername
         const updatedRelationship: Relationship = await response.json();
-        setRelationships((prev) => {
-          // Check if relationship already exists then update, or add new relationship
-          const index = prev.findIndex(
-            (rel) =>
-              rel.username.toLowerCase() === selectedUsername.toLowerCase()
-          );
-          if (index !== -1) {
-            const newRels = [...prev];
-            newRels[index] = updatedRelationship;
-            return newRels;
-          } else {
-            return [...prev, updatedRelationship];
-          }
-        });
-        // Clear inputs
-        setNewTag("");
-        setSelectedUsername("");
+        console.log("Updated Relationship:", updatedRelationship);
+        if (!updatedRelationship || !updatedRelationship.username) {
+          console.error("Invalid response from API:", updatedRelationship);
+          return;
+        }
+        setRelationships((prev) =>
+          prev.map((rel) =>
+            rel.username.toLowerCase() === updatedRelationship.username.toLowerCase()
+              ? updatedRelationship
+              : rel
+          )
+        );
       } else {
         console.error("Error updating relationships:", response.status);
+        // Optionally revert the optimistic update if needed
       }
     } catch (error) {
       console.error("Error updating relationships:", error);
+      // Optionally revert the optimistic update if needed
     }
   };
 
@@ -146,31 +183,32 @@ const UserRelationships: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {relationships.map((rel) => (
-            <tr key={rel.id}>
+          {Array.isArray(relationships) &&
+            relationships.map((rel) => rel && (
+              <tr key={rel.id}>
                 <td
-                    onClick={() => navigate(`/${rel.username}`)}
-                    style={{ cursor: "pointer", color: "blue", textDecoration: "underline" }}
+                  onClick={() => navigate(`/${rel.username}`)}
+                  style={{ cursor: "pointer", color: "blue", textDecoration: "underline" }}
                 >
-                {rel.username}
+                  {rel.username}
                 </td>
-              <td>
-                {rel.tags && rel.tags.length > 0
-                  ? rel.tags.map((tag) => (
-                      <Badge
-                        key={tag}
-                        bg="secondary"
-                        className="me-1"
-                        style={{ cursor: "pointer" }}
-                        onClick={() => handleDeleteTag(tag)}
-                      >
-                        {tag}
-                      </Badge>
-                    ))
-                  : "None"}
-              </td>
-            </tr>
-          ))}
+                <td>
+                  {rel.tags && rel.tags.length > 0
+                    ? rel.tags.map((tag) => (
+                        <Badge
+                          key={tag}
+                          bg="secondary"
+                          className="me-1"
+                          style={{ cursor: "pointer" }}
+                          onClick={() => handleDeleteTag(tag)}
+                        >
+                          {tag}
+                        </Badge>
+                      ))
+                    : "None"}
+                </td>
+              </tr>
+            ))}
         </tbody>
       </Table>
     </Container>
