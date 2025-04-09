@@ -10,8 +10,14 @@ export default defineConfig({
       "/api": {
         target: "http://localhost:3000",
         changeOrigin: true,
+      },
+      // Forward '/ws' requests to WebSocket server
+      "/ws": {
+        target: "ws://localhost:3000",
+        ws: true,
+        changeOrigin: true,
       }
     },
-    https: true,
+    https: false, // Disable HTTPS for local development
   },
 });

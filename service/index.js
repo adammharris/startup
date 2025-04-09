@@ -4,6 +4,8 @@ const uuid = require("uuid");
 const cookieParser = require("cookie-parser");
 const app = express();
 const DB = require("./database.js");
+const websocketServer = require("./websocket.js");
+const initWebSocketServer = require("./websocket.js");
 
 const port = process.argv.length > 2 ? process.argv[2] : 3000;
 
@@ -31,7 +33,7 @@ async function createAuth(res, user) {
   const auth = uuid.v4();
   DB.setUserAuth(user.id, auth);
   res.cookie('auth', auth, {
-    secure: true,
+    //secure: true,
     httpOnly: true,
     sameSite: 'strict',
   });
@@ -260,4 +262,7 @@ app.put("/api/articles/:id", async (req, res) => {
   }
 });
 
-app.listen(port);
+const httpService = app.listen(port, () => {
+  console.log(`Listening on port ${port}`);
+});
+initWebSocketServer(httpService);

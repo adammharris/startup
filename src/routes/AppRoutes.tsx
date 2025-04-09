@@ -10,6 +10,7 @@ import About from '../pages/About.tsx';
 import Help from '../pages/Help.tsx';
 import NotFound from '../pages/NotFound.tsx';
 import Editor from '../pages/Editor.jsx';
+import UserProfile from '../pages/UserProfile.tsx';
 
 // Protected route component
 interface ProtectedRouteProps {
@@ -97,6 +98,7 @@ const AppRoutes = () => {
         } 
       />
       
+      <Route path="/:username_uri" element={<UserProfile />} />
       {/* 404 route */}
       <Route path="*" element={<NotFound />} />
     </Routes>

@@ -72,6 +72,41 @@ const Comments: React.FC<CommentsProps> = ({ accordionKey = "0", articleId, isVi
     }
   }, [comments]);
 
+  // WebSocket connection for live comment updates
+  useEffect(() => {
+    // Connect to the unsecured WS server (adjust URL if necessary)
+    const ws = new WebSocket("ws://localhost:3000");
+  
+    ws.onopen = () => {
+      console.log("WebSocket client: Connected in Comments component");
+    };
+  
+    ws.onmessage = (event) => {
+      try {
+        const incoming = JSON.parse(event.data);
+        // Check if the message is for the current article
+        if (incoming.articleId === articleId) {
+          console.log("WebSocket client: Received new comment:", incoming);
+          // Add the new comment to the current list
+          setComments(prevComments => [incoming, ...prevComments]);
+        }
+      } catch (error) {
+        console.error("WebSocket client: Failed to parse message", error);
+      }
+    };
+  
+    ws.onerror = (error) => {
+      console.error("WebSocket client: Error occurred", error);
+    };
+  
+    ws.onclose = () => {
+      console.log("WebSocket client: Disconnected in Comments component");
+    };
+  
+    // Clean up the connection on unmount
+    return () => ws.close();
+  }, [articleId]);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     if (!newComment.trim()) return;
