@@ -19,8 +19,9 @@ const WeatherWidget: React.FC = () => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [usingDefaultLocation, setUsingDefaultLocation] = useState<boolean>(true);
-  
+  const [usingDefaultLocation, setUsingDefaultLocation] =
+    useState<boolean>(true);
+
   // Function to get weather emoji based on weather code
   const getWeatherEmoji = (code: number, isDay: number): string => {
     // Weather codes from Open-Meteo API
@@ -35,26 +36,28 @@ const WeatherWidget: React.FC = () => {
     if (code <= 99) return "⛈️"; // Thunderstorm
     return "🌈"; // Default
   };
-  
+
   const fetchWeather = async (useUserLocation = false) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // Default to coordinates for Provo, UT
       let lat = 40.2338;
       let lon = -111.6585;
-      
+
       // Try to get user's current location only if requested
       if (useUserLocation && navigator.geolocation) {
         try {
-          const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject, {
-              timeout: 10000,
-              enableHighAccuracy: false,
-            });
-          });
-          
+          const position = await new Promise<GeolocationPosition>(
+            (resolve, reject) => {
+              navigator.geolocation.getCurrentPosition(resolve, reject, {
+                timeout: 10000,
+                enableHighAccuracy: false,
+              });
+            },
+          );
+
           lat = position.coords.latitude;
           lon = position.coords.longitude;
           setUsingDefaultLocation(false);
@@ -63,16 +66,16 @@ const WeatherWidget: React.FC = () => {
           setUsingDefaultLocation(true);
         }
       }
-      
+
       // Fetch weather from Open-Meteo API
       const response = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,is_day`
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,is_day`,
       );
-      
+
       if (!response.ok) {
         throw new Error(`Weather API error: ${response.status}`);
       }
-      
+
       const data = await response.json();
       setWeather(data);
     } catch (err) {
@@ -84,9 +87,9 @@ const WeatherWidget: React.FC = () => {
   };
 
   // Fetch weather with default location on component mount
-  useEffect(() => {
+  /*useEffect(() => {
     fetchWeather();
-  }, []);
+    }, []);*/
 
   // Handler for the location button
   const handleUseMyLocation = () => {
@@ -96,7 +99,12 @@ const WeatherWidget: React.FC = () => {
   return (
     <Card className="mb-4 shadow-sm">
       <Card.Body>
-        <Card.Title>Current Weather</Card.Title>
+        <div className="d-flex justify-content-between align-items-center">
+          <Card.Title>Current Weather</Card.Title>
+          <Button onClick={() => fetchWeather()} className="p-0">
+            🔄
+          </Button>
+        </div>
         {loading ? (
           <div className="text-center py-3">
             <Spinner animation="border" size="sm" />
@@ -108,7 +116,10 @@ const WeatherWidget: React.FC = () => {
           <>
             <div className="d-flex align-items-center mb-2">
               <span style={{ fontSize: "2rem" }}>
-                {getWeatherEmoji(weather.current.weather_code, weather.current.is_day)}
+                {getWeatherEmoji(
+                  weather.current.weather_code,
+                  weather.current.is_day,
+                )}
               </span>
               <div className="ms-3">
                 <h3 className="mb-0">
@@ -121,9 +132,9 @@ const WeatherWidget: React.FC = () => {
               </div>
             </div>
             {usingDefaultLocation && (
-              <Button 
-                variant="outline-primary" 
-                size="sm" 
+              <Button
+                variant="outline-primary"
+                size="sm"
                 onClick={handleUseMyLocation}
                 className="mt-2"
               >

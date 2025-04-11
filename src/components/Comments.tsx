@@ -32,7 +32,14 @@ const Comments: React.FC<CommentsProps> = ({ accordionKey = "0", articleId, isVi
 
   // Create the WebSocket connection
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:3000");
+    // Determine protocol based on the window's location protocol
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    // Connect to the current host, using the relative path '/ws' which Vite will proxy
+    const wsUrl = `${wsProtocol}//${window.location.host}/ws`;
+
+    console.log(`WebSocket client: Attempting to connect to ${wsUrl}`);
+
+    const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
   
     ws.onopen = () => {
@@ -57,12 +64,15 @@ const Comments: React.FC<CommentsProps> = ({ accordionKey = "0", articleId, isVi
       console.error("WebSocket client: Error occurred", error);
     };
   
-    ws.onclose = () => {
-      console.log("WebSocket client: Disconnected in Comments component");
+    ws.onclose = (event) => {
+      console.log(`WebSocket client: Disconnected in Comments component. Code: ${event.code}, Reason: ${event.reason}`);
     };
   
     // Clean up the connection on unmount
-    return () => ws.close();
+    return () => {
+      console.log("WebSocket client: Closing connection due to component unmount or articleId change.");
+      ws.close();
+    };
   }, [articleId]);
 
   const fetchComments = async () => {

@@ -2,6 +2,9 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const uuid = require("uuid");
 const cookieParser = require("cookie-parser");
+const https = require('https');
+const http = require('http');
+const fs = require('fs');
 const app = express();
 const DB = require("./database.js");
 const initWebSocketServer = require("./websocket.js");
@@ -10,7 +13,10 @@ const port = process.argv.length > 2 ? process.argv[2] : 3000;
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.static('public'));
+// Serve frontend static files only in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static('public'));
+}
 
 async function createUser(username, password) {
   console.log("createUser: Creating user `"+username+"` with password `"+password+"`");
@@ -34,7 +40,10 @@ async function createAuth(res, user) {
   const auth = uuid.v4();
   DB.setUserAuth(user.id, auth);
   res.cookie('auth', auth, {
-    //secure: true,
+    // Set secure: true only if not in development (or if explicitly configured for HTTPS)
+    // In production, Caddy handles HTTPS, but the connection between Caddy and Node is HTTP.
+    // However, the cookie should still be marked secure if the *client* connection is HTTPS.
+    secure: true,
     httpOnly: true,
     sameSite: 'strict',
   });
@@ -147,7 +156,7 @@ app.get("/api/articles/:username", async (req, res) => {
     res.send(articles);
   } else {
     console.log("get articles: Recieved request for public articles of user `"+user.username+"`");
-    // TODO: find tags for viewer based on user's assignments.
+
     const tags = await DB.getTagsByUserIdAndViewerId(user.id, viewer.id);
     if (!tags) {
       viewer.tags = [];
@@ -367,7 +376,24 @@ app.delete("/api/user/relationships/:tag", async (req, res) => {
 }
 );
 
-const httpService = app.listen(port, () => {
-  console.log(`Listening on port ${port}`);
-});
-initWebSocketServer(httpService);
+let server;
+
+if (process.env.NODE_ENV === 'production') {
+  // --- Create and start the HTTP server for production ---
+  server = http.createServer(app).listen(port, () => {
+    console.log(`Production service listening on HTTP port ${port}`);
+  });
+} else {
+  // --- Create HTTPS server options for development ---
+  const options = {
+    key: fs.readFileSync('localhost-key.pem'), // Adjust filename if needed
+    cert: fs.readFileSync('localhost.pem')    // Adjust filename if needed
+  };
+  // --- Create and start the HTTPS server for development ---
+  server = https.createServer(options, app).listen(port, () => {
+    console.log(`Development service listening on HTTPS port ${port}`);
+  });
+}
+
+// --- Initialize WebSocket Server with the created server ---
+initWebSocketServer(server);

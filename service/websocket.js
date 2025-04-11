@@ -16,13 +16,13 @@ function initWebSocketServer(server) {
     }
     
     wss.on("connection", (ws) => {
-        console.log("WebSocket: New client connected");
+        console.log("WebSocket: New client connected: ", ws._socket.remoteAddress);
         
         ws.on("message", (message) => {
             try {
                 const parsedData = JSON.parse(message.toString());
                 console.log("WebSocket: Received comment for article", parsedData.articleId, parsedData);
-                // Handle the comment message as needed (e.g. saving to the DB)
+                // Handle the comment message as needed
                 DB.addComment(parsedData);
                 // Broadcast the new comment to all other clients
                 broadcast(JSON.stringify(parsedData), ws);
@@ -32,7 +32,7 @@ function initWebSocketServer(server) {
         });
       
         ws.on("close", () => {
-            console.log("WebSocket: Client disconnected");
+            console.log("WebSocket: Client disconnected: ", ws._socket.remoteAddress);
         });
     });
     

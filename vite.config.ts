@@ -8,16 +8,18 @@ export default defineConfig({
     proxy: {
       // Forward '/api' requests to service
       "/api": {
-        target: "http://localhost:3000",
+        target: "https://localhost:3000",
         changeOrigin: true,
+        secure: false
       },
       // Forward '/ws' requests to WebSocket server
       "/ws": {
-        target: "ws://localhost:3000",
+        target: "wss://localhost:3000",
         ws: true,
         changeOrigin: true,
+        secure: false,
       }
     },
-    https: false, // Disable HTTPS for local development
+    https: true
   },
 });

@@ -45,17 +45,13 @@ const Dashboard: React.FC = () => {
         </div>
       </Card>
       
-      <Stack direction="horizontal" gap={3} className="my-3">
+      <Stack className="flex-column flex-md-row my-3" gap={3}>
         <Card className="p-3">
           <h2>My Account</h2>
           <p>Username: {username}</p>
           <Button variant="primary" onClick={logout}>
-            Log out
+        Log out
           </Button>
-        </Card>
-        <Card className="m-3 p-3">
-          <h2>My Favorites</h2>
-          <p>Coming soon!</p>
         </Card>
         <WeatherWidget />
       </Stack>
