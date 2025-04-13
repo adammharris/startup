@@ -14,8 +14,8 @@ router.put("/relationships", requireAuth, async (req, res) => {
   const user = req.user;
   const { tag, username } = req.body;
 
-  // Add tag to user in relationships
-  const existingRelationship = user.relationships.find(rel => rel.username === username);
+  // Add tag to user in relationships (make sure relationships is an array)
+  const existingRelationship = (Array.isArray(user.relationships) ? user.relationships : []).find(rel => rel.username === username);
   if (existingRelationship) {
     if (!existingRelationship.tags.includes(tag)) {
       console.log("update relationships: Adding tag to existing relationship");
