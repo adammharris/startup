@@ -6,6 +6,7 @@ const fs = require('fs');
 const app = express();
 const DB = require("./database.js");
 const initWebSocketServer = require("./websocket.js");
+const { apiLimiter, authLimiter } = require('./utils/rateLimiter');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -25,11 +26,11 @@ if (process.env.NODE_ENV === 'production') {
   app.use(express.static('public'));
 }
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/articles', articleRoutes);
-app.use('/api/comments', commentRoutes);
-app.use('/api/user', userRoutes);
+// Apply rate limiting to routes
+app.use('/api/auth', authLimiter, authRoutes);  // Strict limiting for auth routes
+app.use('/api/articles', apiLimiter, articleRoutes);
+app.use('/api/comments', apiLimiter, commentRoutes);
+app.use('/api/user', apiLimiter, userRoutes);
 
 let server;
 

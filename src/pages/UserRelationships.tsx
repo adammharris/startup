@@ -111,11 +111,10 @@ const UserRelationships: React.FC = () => {
       }
     } catch (error) {
       console.error("Error updating relationships:", error);
-      // Optionally revert the optimistic update if needed
     }
   };
 
-  // New: delete a tag by calling DELETE on /api/user/relationships/{tag}
+  // delete a tag by calling DELETE on /api/user/relationships/{tag}
   const handleDeleteTag = async (tag: string) => {
     try {
       const response = await fetch(
