@@ -12,7 +12,7 @@ interface Article {
 interface UserContextType {
   // Auth-related state
   loggedIn: boolean;
-  setLoggedIn: (value: boolean) => void; // Add this line
+  setLoggedIn: (value: boolean) => void;
   authLoading: boolean;
   checkAuthStatus: () => Promise<void>;
   username: string | null;
@@ -46,11 +46,19 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         credentials: 'include',
       });
       
-      setLoggedIn(response.ok);
-      setUsername(response.ok ? (await response.json()).username : null);
+      if (response.ok) {
+        const userData = await response.json();
+        setLoggedIn(true);
+        setUsername(userData.username);
+      } else {
+        // Handle 401 or other errors gracefully
+        setLoggedIn(false);
+        setUsername(null);
+      }
     } catch (error) {
       console.error('Error checking authentication status:', error);
       setLoggedIn(false);
+      setUsername(null);
     } finally {
       setAuthLoading(false);
     }
@@ -75,21 +83,34 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   // Articles methods
   const fetchArticles = useCallback(async () => {
+    if (articlesLoading) return; // Prevent multiple simultaneous fetches
+    
     setArticlesLoading(true);
-    if (!username) return;
+    
+    // Only fetch user's articles if they're logged in
+    if (!username) {
+      setArticlesLoading(false);
+      return;
+    }
+    
     try {
       const response = await fetch(`/api/articles/${encodeURIComponent(username)}`, {
         method: "GET",
+        credentials: "include", // Include credentials for auth
       });
+      
       if (response.status === 401) {
+        // If unauthorized, clear auth state
         setLoggedIn(false);
         setUsername(null);
         setArticles([]);
         return;
       }
+      
       if (!response.ok) {
         throw new Error(`Failed to fetch articles: ${response.status}`);
       }
+      
       const data = await response.json();
       setArticles(data);
     } catch (error) {
@@ -97,17 +118,19 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setArticlesLoading(false);
     }
-  }, [username]);
+  }, [username, articlesLoading]);
 
   // Check auth status when location changes
   useEffect(() => {
     checkAuthStatus();
   }, [location, checkAuthStatus]);
 
-  // Initial fetch of articles on component mount
+  // Fetch articles when auth state changes
   useEffect(() => {
-    fetchArticles();
-  }, [fetchArticles]);
+    if (loggedIn && username) {
+      fetchArticles();
+    }
+  }, [loggedIn, username, fetchArticles]);
 
   return (
     <UserContext.Provider 

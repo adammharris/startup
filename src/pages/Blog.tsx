@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Card from 'react-bootstrap/Card';
 import Spinner from 'react-bootstrap/Spinner';
 import Alert from 'react-bootstrap/Alert';
+import Button from 'react-bootstrap/Button';
 import Articles from '../components/Articles';
 
 const Blog: React.FC = () => {
@@ -9,27 +10,31 @@ const Blog: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchBlogArticles = async () => {
-      try {
-        setLoading(true);
-        // Fetch articles by the ShowBrain_Team user
-        const response = await fetch('/api/articles/ShowBrain_Team');
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch blog articles: ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-        setArticles(data);
-      } catch (err) {
-        console.error('Error fetching blog articles:', err);
-        setError('Unable to load blog articles. Please try again later.');
-      } finally {
-        setLoading(false);
+  const fetchBlogArticles = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      // Fetch articles by the ShowBrain_Team user
+      const response = await fetch('/api/articles/ShowBrain_Team', {
+        // Add credentials option to properly handle auth state
+        credentials: 'same-origin'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch blog articles: ${response.statusText}`);
       }
-    };
+      
+      const data = await response.json();
+      setArticles(data);
+    } catch (err) {
+      console.error('Error fetching blog articles:', err);
+      setError('Unable to load blog articles. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchBlogArticles();
   }, []);
 
@@ -49,9 +54,14 @@ const Blog: React.FC = () => {
           <p className="mt-2">Loading blog articles...</p>
         </div>
       ) : error ? (
-        <Alert variant="danger" className="my-4">
-          {error}
-        </Alert>
+        <div className="text-center my-4">
+          <Alert variant="danger" className="mb-3">
+            {error}
+          </Alert>
+          <Button variant="primary" onClick={fetchBlogArticles}>
+            Retry
+          </Button>
+        </div>
       ) : articles.length > 0 ? (
         <Articles articles={articles} />
       ) : (
