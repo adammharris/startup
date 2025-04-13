@@ -1,42 +1,64 @@
-import Card from 'react-bootstrap/Card'
+import { useState, useEffect } from 'react';
+import Card from 'react-bootstrap/Card';
+import Spinner from 'react-bootstrap/Spinner';
+import Alert from 'react-bootstrap/Alert';
 import Articles from '../components/Articles';
 
-
-// Sample blog articles for testing. Database needed
-const sampleBlogArticles = [
-  {
-    id: "blog-1",
-    title: "Getting Started with ShowBrain",
-    content: "ShowBrain is a powerful tool for organizing your thoughts and ideas. In this article, we'll explore the basics of getting started with ShowBrain...",
-    date: "2024-03-01T12:00:00Z",
-    author: "ShowBrain Team"
-  },
-  {
-    id: "blog-2",
-    title: "Advanced ShowBrain Techniques",
-    content: "Once you've mastered the basics of ShowBrain, it's time to explore some advanced techniques. In this article, we'll dive deeper into...",
-    date: "2024-03-05T14:30:00Z",
-    author: "ShowBrain Team"
-  },
-  {
-    id: "blog-3",
-    title: "ShowBrain for Teams",
-    content: "ShowBrain isn't just for individuals. Teams can benefit greatly from using ShowBrain for collaborative work. Let's explore how teams can use ShowBrain to...",
-    date: "2024-03-10T09:15:00Z",
-    author: "ShowBrain Team"
-  }
-];
-
 const Blog: React.FC = () => {
+  const [articles, setArticles] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchBlogArticles = async () => {
+      try {
+        setLoading(true);
+        // Fetch articles by the ShowBrain_Team user
+        const response = await fetch('/api/articles/ShowBrain_Team');
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch blog articles: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        setArticles(data);
+      } catch (err) {
+        console.error('Error fetching blog articles:', err);
+        setError('Unable to load blog articles. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogArticles();
+  }, []);
+
   return (
     <main className="text-dark p-5">
-        <Card className="p-5 m-5">
-            <h1>Blog</h1>
-            <hr/>
-            <p>Welcome to the ShowBrain blog!</p>
-        </Card>
-        
-        <Articles articles={sampleBlogArticles}/>
+      <Card className="p-5 m-5">
+        <h1>Blog</h1>
+        <hr/>
+        <p>Welcome to the ShowBrain blog!</p>
+      </Card>
+      
+      {loading ? (
+        <div className="text-center my-5">
+          <Spinner animation="border" role="status" variant="primary">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+          <p className="mt-2">Loading blog articles...</p>
+        </div>
+      ) : error ? (
+        <Alert variant="danger" className="my-4">
+          {error}
+        </Alert>
+      ) : articles.length > 0 ? (
+        <Articles articles={articles} />
+      ) : (
+        <Alert variant="info" className="my-4">
+          No blog articles available at the moment. Check back soon!
+        </Alert>
+      )}
     </main>
   );
 }
