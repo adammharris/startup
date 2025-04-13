@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
@@ -7,6 +7,7 @@ import Form from "react-bootstrap/Form";
 import { useNavigate } from "react-router-dom";
 import { useArticles } from "../contexts/UserContext.tsx";
 import PlainQuillEditor from "../components/PlainQuillEditor";
+import { markdownToHtml, htmlToMarkdown } from "../utils/markdownConverter";
 
 export default function Editor({ article = {}, onSave, onCancel }) {
   const [title, setTitle] = useState(article.title || "");
@@ -17,7 +18,7 @@ export default function Editor({ article = {}, onSave, onCancel }) {
   const [isSaving, setSaving] = useState(false);
   const navigate = useNavigate();
   const { fetchArticles } = useArticles();
-
+  const fileInputRef = useRef(null);
 
   // Constants
   const MAX_TAG_LENGTH = 30;
@@ -188,11 +189,90 @@ export default function Editor({ article = {}, onSave, onCancel }) {
     }
   };
 
+  // File upload functionality
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Check if the file is a Markdown file
+    if (file.type !== "text/markdown" && !file.name.endsWith('.md')) {
+      alert("Please upload a Markdown file (.md)");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const fileContent = event.target.result;
+      
+      // Extract the filename without extension as the potential title
+      let fileName = file.name.replace(/\.[^/.]+$/, "");
+      
+      // If there's no existing title, use the file name
+      if (!title) {
+        setTitle(fileName);
+      }
+      
+      // Convert Markdown to HTML and set as content
+      const htmlContent = markdownToHtml(fileContent);
+      setContent(htmlContent);
+    };
+    
+    reader.readAsText(file);
+    
+    // Reset the file input so the same file can be selected again
+    e.target.value = null;
+  };
+
+  // File download functionality
+  const downloadAsMarkdown = () => {
+    const markdownContent = htmlToMarkdown(content);
+    const fileName = `${title || 'article'}.md`;
+    
+    // Create a blob with the content
+    const blob = new Blob([markdownContent], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    
+    // Create a temporary anchor element to trigger the download
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    
+    // Clean up
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <Container className="p-5">
       <Card>
         <Card.Header>
-          <h2>{article.id ? "Edit Article" : "Create New Article"}</h2>
+          <div className="d-flex justify-content-between align-items-center">
+            <h2>{article.id ? "Edit Article" : "Create New Article"}</h2>
+            <div className="d-flex gap-2">
+              <Button 
+                variant="outline-primary" 
+                onClick={() => fileInputRef.current.click()}
+              >
+                Import Markdown
+              </Button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                accept=".md,text/markdown"
+                style={{ display: 'none' }}
+              />
+              
+              <Button 
+                variant="outline-primary" 
+                onClick={downloadAsMarkdown}
+              >
+                Export Markdown
+              </Button>
+            </div>
+          </div>
         </Card.Header>
         <Card.Body>
           <Form onSubmit={handleSubmit}>
