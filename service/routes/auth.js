@@ -24,6 +24,13 @@ function generateTokens(user) {
 
 async function createUser(username, password) {
   console.log("createUser: Creating user `"+username+"` with password `"+password+"`");
+  
+  // Validate password
+  const validation = validatePassword(password, username);
+  if (!validation.valid) {
+    throw new Error(validation.reason);
+  }
+  
   const salt = await bcrypt.genSalt(10);
   const passwordHash = await bcrypt.hash(password, salt);
   const user = {
@@ -59,15 +66,24 @@ async function createAuth(res, user) {
 
 // registration
 router.post("/", async (req, res) => {
-  console.log("registration: Recieved registration request: " + req.body.username);
+  console.log("registration: Received registration request: " + req.body.username);
+  
+  if (!req.body.username || !req.body.password) {
+    return res.status(400).send({ msg: "Username and password are required" });
+  }
+  
   if (await DB.getUserByUsername(req.body.username)) {
     console.log("registration: Registration rejected because user already exists")
     res.status(409).send({ msg: "Existing user" });
   } else {
     console.log("registration: Registration accepted")
-    const user = await createUser(req.body.username, req.body.password);
-    createAuth(res, user);
-    res.send({ username: user.username });
+    try {
+      const user = await createUser(req.body.username, req.body.password);
+      createAuth(res, user);
+      res.send({ username: user.username });
+    } catch (error) {
+      res.status(400).send({ msg: error.message });
+    }
   }
 });
 
