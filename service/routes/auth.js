@@ -159,7 +159,6 @@ router.delete("/", async (req, res) => {
   }
   if (user) {
     console.log("logout: Logging out `"+user.username+"`");
-    await DB.deleteUserAuth(user.id);
     res.clearCookie('access', { path: '/' });
     res.clearCookie('refresh', { path: '/' });
   } else {

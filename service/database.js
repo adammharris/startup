@@ -89,12 +89,6 @@ async function setArticle(articleId, article) {
 function deleteUser(userId) {
     return userCollection.deleteOne({ id: userId });
 }
-async function deleteUserAuth(userId) {
-    return userCollection.updateOne(
-        { id: userId, },
-        { $unset: { auth: "" } }
-    );
-}
 async function deleteArticle(articleId) {
     return articleCollection.deleteOne({ id: articleId });
 }
@@ -135,7 +129,6 @@ module.exports = {
     setUserAuth,
     setArticle,
     deleteUser,
-    deleteUserAuth,
     deleteArticle,
     getArticlesByUserIdAndTags,
     getTagsByUserIdAndViewerId
