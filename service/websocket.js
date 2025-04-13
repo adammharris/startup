@@ -1,5 +1,6 @@
 const WebSocket = require("ws");
 const DB = require("./database.js");
+const { filterProfanity } = require("./utils/profanityFilter");
 
 function initWebSocketServer(server) {
     const wss = new WebSocket.Server({ server });
@@ -18,12 +19,20 @@ function initWebSocketServer(server) {
     wss.on("connection", (ws) => {
         console.log("WebSocket: New client connected: ", ws._socket.remoteAddress);
         
-        ws.on("message", (message) => {
+        ws.on("message", async (message) => {
             try {
-                const parsedData = JSON.parse(message.toString());
+                let parsedData = JSON.parse(message.toString());
                 console.log("WebSocket: Received comment for article", parsedData.articleId, parsedData);
+                
+                // Apply profanity filtering to the comment text
+                if (parsedData.text) {
+                    parsedData.text = await filterProfanity(parsedData.text);
+                    console.log("WebSocket: Applied profanity filtering to comment");
+                }
+                
                 // Handle the comment message as needed
                 DB.addComment(parsedData);
+                
                 // Broadcast the new comment to all other clients
                 broadcast(JSON.stringify(parsedData), ws);
             } catch (error) {

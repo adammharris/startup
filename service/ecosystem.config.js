@@ -4,7 +4,7 @@
 module.exports = {
     apps : [{
       name   : "startup",
-      script : "index.js",
+      script : "server.js",
       env_production: {
          NODE_ENV: "production"
       }

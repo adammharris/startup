@@ -2,28 +2,8 @@ const express = require("express");
 const uuid = require("uuid");
 const DB = require("../database.js");
 const { requireAuth } = require("../utils/authUtils");
+const { filterProfanity } = require("../utils/profanityFilter");
 const router = express.Router();
-
-// Helper function for profanity filtering
-async function filterProfanity(text) {
-  try {
-    const encodedText = encodeURIComponent(text);
-    const response = await fetch(
-      `https://www.purgomalum.com/service/json?text=${encodedText}`
-    );
-    
-    if (!response.ok) {
-      console.error("PurgoMalum API error:", response.status);
-      return text; // Return original text if API fails
-    }
-    
-    const data = await response.json();
-    return data.result;
-  } catch (error) {
-    console.error("Error filtering profanity:", error);
-    return text; // Fallback to original text
-  }
-}
 
 // add comment to article - use requireAuth middleware
 router.post("/:id", requireAuth, async (req, res) => {
