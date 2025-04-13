@@ -28,9 +28,13 @@ function addArticle(article) {
 function addComment(comment) {
     return commentCollection.insertOne(comment);
 }
-async function getUserByAuth(authToken) {
-    return userCollection.findOne({ auth: authToken });
+
+// getUserByAuth is removed - we'll use JWT tokens directly
+
+async function getUserById(userId) {
+    return userCollection.findOne({ id: userId });
 }
+
 async function getUserByUsername(username) {
     return userCollection.findOne({ username: username });
 }
@@ -45,7 +49,9 @@ async function getArticlesByUserId(userId) {
 }
 
 async function getCommentByArticleId(articleId) {
-    return commentCollection.find({ articleId: articleId }).toArray();
+    return commentCollection.find({ articleId: articleId })
+        .sort({ _id: -1 }) // flipped around so newest comments are first
+        .toArray();
 }
 
 function setUser(userId, user) {
@@ -120,7 +126,7 @@ module.exports = {
     addUser,
     addArticle,
     addComment,
-    getUserByAuth,
+    getUserById,
     getUserByUsername,
     getArticleById,
     getArticlesByUserId,

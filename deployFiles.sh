@@ -22,14 +22,21 @@ mkdir build
 npm install # make sure vite is installed so that we can bundle
 npm run build # build the React front end
 cp -rf dist build/public # move the React front end to the target distribution
-cp service/*.js build # move the back end service to the target distribution
-cp service/*.json build
+
+# Copy all service files including subdirectories
+cp -rf service/*.js build # move the back end service JavaScript files
+cp -rf service/*.json build # move configuration files
+mkdir -p build/routes build/utils # create subdirectories
+cp -rf service/routes/* build/routes # copy route files
+cp -rf service/utils/* build/utils # copy utility files
 
 # Step 2
 printf "\n----> Clearing out previous distribution on the target\n"
 ssh -i "$key" ubuntu@$hostname << ENDSSH
 rm -rf services/${service}
 mkdir -p services/${service}
+mkdir -p services/${service}/routes
+mkdir -p services/${service}/utils
 ENDSSH
 
 # Step 3
