@@ -8,6 +8,39 @@ const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "refreshsecret";
 
+function validatePassword(password, username) {
+  // Password must be at least 8 characters long
+  if (password.length < 8) {
+    return { 
+      valid: false, 
+      reason: "Password must be at least 8 characters long" 
+    };
+  }
+
+  // Password should not be the same as the username
+  if (password.toLowerCase() === username.toLowerCase()) {
+    return { 
+      valid: false, 
+      reason: "Password cannot be the same as your username" 
+    };
+  }
+
+  // Password should contain at least one uppercase letter, one lowercase letter, and one number
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  
+  if (!hasUppercase || !hasLowercase || !hasNumber) {
+    return { 
+      valid: false, 
+      reason: "Password must contain at least one uppercase letter, one lowercase letter, and one number" 
+    };
+  }
+
+  // Password is valid
+  return { valid: true };
+}
+
 function generateTokens(user) {
   const accessToken = jwt.sign(
     { id: user.id, username: user.username },
