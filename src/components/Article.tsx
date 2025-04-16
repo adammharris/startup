@@ -5,7 +5,7 @@ import Badge from "react-bootstrap/Badge";
 import Comments from "./Comments";
 import Stack from "react-bootstrap/Stack";
 import Modal from "react-bootstrap/Modal";
-import DOMPurify from "dompurify";
+import { sanitizeHTML } from '../utils/htmlSanitizer';
 import { useNavigate } from "react-router-dom";
 
 interface ArticleType {
@@ -28,49 +28,22 @@ const Article: React.FC<ArticleProps> = ({ article, onDelete }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<boolean>(false);
 
   const getPreviewText = (content: string): string => {
-    // Create a temporary element to render the HTML content
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = content;
-    // Get plain text from HTML
-    const plainText = tempDiv.textContent || tempDiv.innerText || "";
-    if (plainText.length <= 100) return plainText;
-    return plainText.substring(0, 100) + "...";
-  };
-
-  const sanitizeHTML = (html: string): string => {
-    // Step 1: Remove all images with non-data URLs using a regex
-    const imagesFiltered = html.replace(
-      /<img[^>]+src\s*=\s*["'](?!data:)[^"'>]+["'][^>]*>/gi,
-      "",
-    );
-    // Step 2: Sanitize using DOMPurify
-    return DOMPurify.sanitize(imagesFiltered, {
-      ALLOWED_TAGS: [
-        "b",
-        "i",
-        "em",
-        "strong",
-        "p",
-        "br",
-        "ul",
-        "ol",
-        "li",
-        "h1",
-        "h2",
-        "h3",
-        "a",
-        "img",
-      ],
-      ALLOWED_ATTR: [
-        "href",
-        "target",
-        "src",
-        "alt",
-        "title",
-        "width",
-        "height",
-      ],
-    });
+    if (!content) {
+      return '';
+    }
+    
+    try {
+      // Create a temporary element to render the HTML content
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = content;
+      // Get plain text from HTML
+      const plainText = tempDiv.textContent || tempDiv.innerText || "";
+      if (plainText.length <= 100) return plainText;
+      return plainText.substring(0, 100) + "...";
+    } catch (error) {
+      console.error("Error getting preview text:", error);
+      return '';
+    }
   };
 
   const toggleExpanded = (): void => {
@@ -79,8 +52,6 @@ const Article: React.FC<ArticleProps> = ({ article, onDelete }) => {
 
   const handleDelete = (): void => {
     try {
-      // TODO: not localStorage
-
       // Close modals
       setShowDeleteConfirm(false);
       setShowModal(false);
@@ -105,10 +76,14 @@ const Article: React.FC<ArticleProps> = ({ article, onDelete }) => {
       </Card.Header>
       <Card.Body>
         {expanded || article.content.length <= 100 ? (
-          <div
-            dangerouslySetInnerHTML={{ __html: sanitizeHTML(article.content) }}
-            className="text-break"
-          />
+          article.content ? (
+            <div
+              dangerouslySetInnerHTML={{ __html: sanitizeHTML(article.content) }}
+              className="text-break"
+            />
+          ) : (
+            <Card.Text className="text-break">No content available</Card.Text>
+          )
         ) : (
           <Card.Text className="text-break">
             {getPreviewText(article.content)}
@@ -167,9 +142,13 @@ const Article: React.FC<ArticleProps> = ({ article, onDelete }) => {
           <Modal.Title className="text-break">{article.title}</Modal.Title>
         </Modal.Header>
         <Modal.Body className="text-break">
-          <div
-            dangerouslySetInnerHTML={{ __html: sanitizeHTML(article.content) }}
-          />
+          {article.content ? (
+            <div
+              dangerouslySetInnerHTML={{ __html: sanitizeHTML(article.content) }}
+            />
+          ) : (
+            <div>No content available</div>
+          )}
           {article.tags && article.tags.length > 0 && (
             <div className="mt-3">
               {article.tags.map((tag, index) => (
