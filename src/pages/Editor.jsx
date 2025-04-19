@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useArticles } from "../contexts/UserContext.tsx";
 import PlainQuillEditor from "../components/PlainQuillEditor";
 import { markdownToHtml, htmlToMarkdown } from "../utils/markdownConverter";
+import { sanitizeHTML } from "../utils/htmlSanitizer";
 
 export default function Editor({ article = {}, onSave, onCancel }) {
   const [title, setTitle] = useState(article.title || "");
@@ -67,6 +68,7 @@ export default function Editor({ article = {}, onSave, onCancel }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const sanitizedContent = sanitizeHTML(content);
 
     // If updating an existing article, compute only the fields that changed.
     let updateData = {};
@@ -88,7 +90,7 @@ export default function Editor({ article = {}, onSave, onCancel }) {
       // Creating new articles requires sending all necessary fields.
       updateData = {
         title,
-        content,
+        sanitizedContent,
         tags,
         date: new Date().toLocaleDateString("en-US", {
           year: "numeric",

@@ -76,9 +76,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   // Articles methods
   const fetchArticles = useCallback(async () => {
     setArticlesLoading(true);
-    if (!username) return;
+    // Use 'anonymous' as the username if not logged in
+    const fetchUsername = username || "ShowBrain_Team";
     try {
-      const response = await fetch(`/api/articles/${encodeURIComponent(username)}`, {
+      const response = await fetch(`/api/articles/${encodeURIComponent(fetchUsername)}`, {
         method: "GET",
       });
       if (response.status === 401) {

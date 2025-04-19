@@ -1,32 +1,37 @@
-import DOMPurify from 'dompurify';
-import type { Config } from 'dompurify';
+import sanitizeHtml from 'sanitize-html';
 
 export function sanitizeHTML(html: string): string {
   if (!html) return '';
-
-  // only allow http(s), mailto and data:image URIs
-  const purifyConfig: Config = {
-    ALLOWED_TAGS: [
+  const sanitizeConfig: sanitizeHtml.IOptions = {
+    allowedTags: [
       'b', 'i', 'em', 'strong', 'p', 'br',
       'ul', 'ol', 'li', 'h1', 'h2', 'h3',
       'a', 'img', 'u'
     ],
-    ALLOWED_ATTR: [
-      'href', 'target', 'rel',
-      'src', 'alt', 'title', 'width', 'height'
-    ],
-    ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto):|data:image\/)/i,
-    FORCE_BODY: false
+    // Directly map ALLOWED_ATTR, but structure it per tag or use '*' for all
+    allowedAttributes: {
+      // Allow these attributes on any tag (*) that is allowed
+      '*': ['alt', 'title', 'width', 'height'], 
+      // Specific attributes for 'a' tags
+      'a': [ 'href', 'target', 'rel' ],
+      // Specific attributes for 'img' tags
+      'img': [ 'src', 'alt', 'title', 'width', 'height' ] 
+      // Note: 'alt', 'title', 'width', 'height' are duplicated here from '*' 
+      // but it's okay. You could remove them from '*' if you only want them on img.
+    },
+    allowedSchemesByTag: {
+         img: ['data', 'http', 'https'] // Allow data URIs specifically for <img> src
+    },
   };
 
-  // 1) strip any non-data src images
-  // 2) strip any srcset attributes
-  const cleaned = html
-    .replace(
-      /<img[^>]+src\s*=\s*["'](?!data:)[^"'>]+["'][^>]*>/gi,
-      ''
-    )
-    .replace(/\s+srcset\s*=\s*["'][^"']*["']/gi, '');
-
-  return DOMPurify.sanitize(cleaned, purifyConfig);
+  //console.debug('sanitizeHTML input:', html);
+  try {
+    const cleaned = sanitizeHtml(html, sanitizeConfig); 
+    //console.debug('sanitizeHTML output:', cleaned);
+    return cleaned;
+  } catch (error) {
+    // Keep the error handling
+    console.error('sanitizeHTML error:', error, html);
+    return ''; 
+  }
 }

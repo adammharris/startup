@@ -1,42 +1,50 @@
-import Card from 'react-bootstrap/Card'
+import Card from 'react-bootstrap/Card';
 import Articles from '../components/Articles';
+import { useEffect, useState } from 'react';
+import Spinner from 'react-bootstrap/Spinner';
 
-
-// Sample blog articles for testing. Database needed
-const sampleBlogArticles = [
-  {
-    id: "blog-1",
-    title: "Getting Started with ShowBrain",
-    content: "ShowBrain is a powerful tool for organizing your thoughts and ideas. In this article, we'll explore the basics of getting started with ShowBrain...",
-    date: "2024-03-01T12:00:00Z",
-    author: "ShowBrain Team"
-  },
-  {
-    id: "blog-2",
-    title: "Advanced ShowBrain Techniques",
-    content: "Once you've mastered the basics of ShowBrain, it's time to explore some advanced techniques. In this article, we'll dive deeper into...",
-    date: "2024-03-05T14:30:00Z",
-    author: "ShowBrain Team"
-  },
-  {
-    id: "blog-3",
-    title: "ShowBrain for Teams",
-    content: "ShowBrain isn't just for individuals. Teams can benefit greatly from using ShowBrain for collaborative work. Let's explore how teams can use ShowBrain to...",
-    date: "2024-03-10T09:15:00Z",
-    author: "ShowBrain Team"
-  }
-];
+// Define blog article type
+interface ArticleType { id: string; title: string; content: string; date: string; author: string; }
 
 const Blog: React.FC = () => {
+  const [articles, setArticles] = useState<ArticleType[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  
+  useEffect(() => {
+    const loadArticles = async () => {
+      try {
+        const resp = await fetch('/api/articles/ShowBrain_Team');
+        if (!resp.ok) throw new Error(`Status ${resp.status}`);
+        const data: ArticleType[] = await resp.json();
+        setArticles(data);
+      } catch (e) {
+        console.error('Error fetching blog articles:', e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadArticles();
+  }, []);
+  
+  if (loading) {
+    return (
+      <div className="text-center my-5">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+        <p className="mt-2">Loading articles...</p>
+      </div>
+    );
+  }
+
   return (
     <main className="text-dark p-5">
-        <Card className="p-5 m-5">
-            <h1>Blog</h1>
-            <hr/>
-            <p>Welcome to the ShowBrain blog!</p>
-        </Card>
-        
-        <Articles articles={sampleBlogArticles}/>
+      <Card className="p-5 m-5">
+        <h1>Blog</h1>
+        <hr/>
+        <p>Welcome to the ShowBrain blog!</p>
+      </Card>
+      <Articles articles={articles} refreshOnMount={false} />
     </main>
   );
 }
