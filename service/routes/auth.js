@@ -189,4 +189,19 @@ router.post("/refresh", (req, res) => {
   });
 });
 
+router.get("/status", (req, res) => {
+  const access = req.cookies['access'];
+  const refresh = req.cookies['refresh'];
+  if (access) {
+    jwt.verify(access, JWT_SECRET, (err, user) => {
+      if (err) {
+        return res.status(200).send({ loggedIn: false });
+      }
+      res.status(200).send({ loggedIn: true, username: user.username });
+    });
+  } else {
+    res.status(200).send({ loggedIn: false });
+  }
+});
+
 module.exports = router;

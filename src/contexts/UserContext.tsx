@@ -41,13 +41,19 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const checkAuthStatus = useCallback(async () => {
     try {
       setAuthLoading(true);
-      const response = await fetch('/api/user', {
-        method: 'GET',
-        credentials: 'include',
+      const response = await fetch('/api/auth/status', {
+        method: "GET",
+        credentials: "include",
       });
       
-      setLoggedIn(response.ok);
-      setUsername(response.ok ? (await response.json()).username : null);
+      if (!response.ok) {
+        throw new Error(`Auth status request failed: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      setLoggedIn(data.loggedIn);
+      setUsername(data.loggedIn ? data.username : null);
     } catch (error) {
       console.error('Error checking authentication status:', error);
       setLoggedIn(false);

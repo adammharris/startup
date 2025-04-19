@@ -17,25 +17,63 @@ interface ArticleType {
 }
 
 interface ArticlesProps {
-  articles?: ArticleType[]; // Make optional to allow using context
-  refreshOnMount?: boolean; // Add option to force refresh when component mounts
+  /** Pre‑loaded articles (legacy / testing) */
+  articles?: ArticleType[];
+  /** Force a server hit when the component mounts */
+  refreshOnMount?: boolean;
+  /** Always show articles for this user, ignoring the logged‑in account */
+  fixedUsername?: string;
 }
 
 const Articles: React.FC<ArticlesProps> = ({ 
   articles: propArticles, 
-  refreshOnMount = true 
+  refreshOnMount = true,
+  fixedUsername,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  // When we’re pinned to a particular username (e.g. ShowBrain_Team),
+  // keep that data in local state instead of the context cache.
+  const [fixedArticles, setFixedArticles] = useState<ArticleType[]>([]);
   const { articles: contextArticles, fetchArticles, isLoading } = useArticles();
   const [localLoading, setLocalLoading] = useState<boolean>(false);
   
-  // Use either props or context articles
-  const articles = propArticles || contextArticles || [];
+  const articles =
+    propArticles ??
+    (fixedUsername ? fixedArticles : contextArticles) ??
+    [];
   
-  // Fetch articles when component mounts or when location changes
   useEffect(() => {
-    const loadArticles = async () => {
+    if (!refreshOnMount) return;
+    if (propArticles) return; // caller supplied its own data
+
+    // --------- Fixed‑username mode (e.g. Blog) ----------
+    if (fixedUsername) {
+      if (fixedArticles.length) return; // already cached locally
+      const loadFixed = async () => {
+        setLocalLoading(true);
+        try {
+          const resp = await fetch(
+            `/api/articles/${encodeURIComponent(fixedUsername)}`,
+            { method: "GET" },
+          );
+          if (!resp.ok) throw new Error(`Status ${resp.status}`);
+          const data: ArticleType[] = await resp.json();
+          setFixedArticles(data);
+        } catch (err) {
+          console.error("Error fetching fixed‑user articles:", err);
+        } finally {
+          setLocalLoading(false);
+        }
+      };
+      loadFixed();
+      return;
+    }
+
+    // --------- Normal mode (logged‑in or anonymous) ----------
+    if (contextArticles.length) return; // already cached in context
+
+    const loadContext = async () => {
       setLocalLoading(true);
       try {
         await fetchArticles();
@@ -43,25 +81,37 @@ const Articles: React.FC<ArticlesProps> = ({
         setLocalLoading(false);
       }
     };
-    
-    if (refreshOnMount) {
-      loadArticles();
-    }
-  }, [location, fetchArticles, refreshOnMount]);
+    loadContext();
+  }, [
+    location,
+    refreshOnMount,
+    propArticles,
+    fixedUsername,
+    fixedArticles.length,
+    contextArticles.length,
+    fetchArticles,
+  ]);
   
   const handleDeleteArticle = async (id: string): Promise<void> => {
     try {
-      const response = await fetch(`/api/articles/${encodeURIComponent(id)}`, {
-        method: "DELETE",
-      });
-      
+      const response = await fetch(
+        `/api/articles/${encodeURIComponent(id)}`,
+        { method: "DELETE" },
+      );
       if (!response.ok) {
         throw new Error(`Failed to delete article: ${response.status}`);
       }
-      
-      // Refresh articles from the server
-      await fetchArticles();
-      
+
+      if (fixedUsername) {
+        // Reload just this user’s feed
+        const resp = await fetch(
+          `/api/articles/${encodeURIComponent(fixedUsername)}`,
+        );
+        const data: ArticleType[] = await resp.json();
+        setFixedArticles(data);
+      } else {
+        await fetchArticles(); // refresh context cache
+      }
     } catch (error) {
       console.error("Error deleting article:", error);
     }
