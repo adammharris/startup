@@ -50,10 +50,10 @@ const Dashboard: React.FC = () => {
           <h2>My Account</h2>
           <p>Username: {username}</p>
           <Button variant="primary" onClick={logout}>
-        Log out
+            Log out
           </Button>
         </Card>
-        <WeatherWidget />
+        //<WeatherWidget />
       </Stack>
       <Card className="p-3">
         <h2>My Relationships</h2>

@@ -26,6 +26,9 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
+// Add a module‑scoped flag to avoid duplicate runs (e.g., from React Strict Mode)
+let hasCheckedAuth = false;
+
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   // Auth state
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
@@ -37,97 +40,98 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [articlesLoading, setArticlesLoading] = useState(false);
 
-  // Auth methods
-  const checkAuthStatus = useCallback(async () => {
+  // --- Articles methods ---
+  // Modified fetchArticles to accept username argument
+  const fetchArticles = useCallback(async (currentUsername: string | null) => {
+    setArticlesLoading(true);
+    // Use the username passed as an argument, default to ShowBrain_Team if null/falsy
+    const fetchUsername = currentUsername || "ShowBrain_Team"; 
     try {
-      setAuthLoading(true);
+      const response = await fetch(`/api/articles/${encodeURIComponent(fetchUsername)}`, {
+        method: "GET",
+      });
+      // No need to check for 401 here, as checkAuthStatus handles login state
+      if (!response.ok) {
+        throw new Error(`Failed to fetch articles for ${fetchUsername}: ${response.status}`);
+      }
+      const data = await response.json();
+      setArticles(data);
+    } catch (error) {
+      console.error("Error fetching articles:", error);
+      setArticles([]); // Clear articles on error
+    } finally {
+      setArticlesLoading(false);
+    }
+  }, []); // No dependencies needed as username is passed directly
+
+  // --- Auth methods ---
+  const checkAuthStatus = useCallback(async () => {
+    setAuthLoading(true);
+    let fetchedUsername: string | null = null;
+    let fetchedLoggedIn = false;
+    try {
       const response = await fetch('/api/auth/status', {
         method: "GET",
         credentials: "include",
       });
       
       if (!response.ok) {
-        throw new Error(`Auth status request failed: ${response.status}`);
+        // Don't throw, just assume logged out on failure (e.g., 401)
+        console.warn(`Auth status check failed: ${response.status}`);
+      } else {
+        const data = await response.json();
+        fetchedLoggedIn = data.loggedIn;
+        fetchedUsername = data.loggedIn ? data.username : null;
       }
       
-      const data = await response.json();
-      
-      setLoggedIn(data.loggedIn);
-      setUsername(data.loggedIn ? data.username : null);
+      setLoggedIn(fetchedLoggedIn);
+      setUsername(fetchedUsername);
+
     } catch (error) {
       console.error('Error checking authentication status:', error);
-      setLoggedIn(false);
+      setLoggedIn(false); // Reset on network/other errors
+      setUsername(null);
     } finally {
       setAuthLoading(false);
+      // Fetch articles *after* auth status is determined, using the resolved username
+      fetchArticles(fetchedUsername);
     }
-  }, []);
+  // Depend on fetchArticles callback
+  }, [fetchArticles]);
 
   const logout = useCallback(async () => {
+    // ... logout logic remains the same ...
     try {
-      // Tell the server to clear the auth token
-      await fetch("/api/auth", {
-        method: "DELETE",
-        credentials: "include",
-      });
+      await fetch("/api/auth", { method: "DELETE", credentials: "include" });
     } catch (error) {
       console.error("Error during logout:", error);
     } finally {
-      // Reset state
       setLoggedIn(false);
       setUsername(null);
-      setArticles([]);
+      setArticles([]); // Clear articles on logout
     }
   }, []);
 
-  // Articles methods
-  const fetchArticles = useCallback(async () => {
-    setArticlesLoading(true);
-    // Use 'anonymous' as the username if not logged in
-    const fetchUsername = username || "ShowBrain_Team";
-    try {
-      const response = await fetch(`/api/articles/${encodeURIComponent(fetchUsername)}`, {
-        method: "GET",
-      });
-      if (response.status === 401) {
-        setLoggedIn(false);
-        setUsername(null);
-        setArticles([]);
-        return;
-      }
-      if (!response.ok) {
-        throw new Error(`Failed to fetch articles: ${response.status}`);
-      }
-      const data = await response.json();
-      setArticles(data);
-    } catch (error) {
-      console.error("Error fetching articles:", error);
-    } finally {
-      setArticlesLoading(false);
-    }
-  }, [username]);
-
-  // Check auth status when location changes
+  // --- Effects ---
+  // Effect: Check auth status only once at startup (strict mode tolerant)
   useEffect(() => {
+    if (hasCheckedAuth) return;
+    hasCheckedAuth = true;
     checkAuthStatus();
-  }, [location, checkAuthStatus]);
+  }, []);
 
-  // Initial fetch of articles on component mount
-  useEffect(() => {
-    fetchArticles();
-  }, [fetchArticles]);
+  // Removed previous effect that depended on location
 
   return (
     <UserContext.Provider 
       value={{ 
-        // Auth
         loggedIn, 
         setLoggedIn,
         authLoading, 
         checkAuthStatus,
-        // Articles
         articles, 
-        fetchArticles, 
-        articlesLoading: articlesLoading,
+        fetchArticles: () => fetchArticles(username), // Provide a version without args for external use if needed
+        articlesLoading,
         username,
         logout,
       }}
@@ -153,5 +157,6 @@ export const useAuth = () => {
 
 export const useArticles = () => {
   const { articles, fetchArticles, articlesLoading } = useUser();
+  // Note: fetchArticles from useUser now requires no args if called externally
   return { articles, fetchArticles, isLoading: articlesLoading };
 };

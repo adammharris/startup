@@ -75,7 +75,7 @@ const Article: React.FC<ArticleProps> = ({ article, onDelete }) => {
         <small className="text-muted text-break">{article.date}</small>
       </Card.Header>
       <Card.Body>
-        {expanded || article.content.length <= 100 ? (
+        {expanded || (article.content ? article.content.length : 0) <= 100 ? (
           article.content ? (
             <div
               dangerouslySetInnerHTML={{ __html: sanitizeHTML(article.content) }}
@@ -111,7 +111,7 @@ const Article: React.FC<ArticleProps> = ({ article, onDelete }) => {
       </Card.Body>
       <Card.Footer className="text-muted">
         <Stack direction="horizontal">
-          {article.content.length > 100 && (
+          {article.content && article.content.length > 100 && (
             <Button
               variant="outline-secondary"
               className="p-1"
