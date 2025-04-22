@@ -4,7 +4,7 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
-import { Stack, Alert, Row, Col } from "react-bootstrap";
+import { Alert, Row, Col } from "react-bootstrap";
 import { useAuth } from "../contexts/UserContext";
 
 export const Login: React.FC = () => {
@@ -15,14 +15,17 @@ export const Login: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { setLoggedIn, loggedIn} = useAuth();
+  const { checkAuthStatus } = useAuth();
   
   // Get redirectUrl from state or use dashboard as default
   const from = location.state?.from?.pathname || "/dashboard";
 
-  if (loggedIn) {
-    // If already logged in, redirect to the dashboard
-    navigate(from, { replace: true });
-  }
+  // Redirect when loggedIn becomes true, instead of during render
+  useEffect(() => {
+    if (loggedIn) {
+      navigate(from, { replace: true });
+    }
+  }, [loggedIn, from, navigate]);
 
   // Validate password whenever it changes and we're in register mode
   useEffect(() => {
@@ -85,10 +88,8 @@ export const Login: React.FC = () => {
       });
       
       if (response.ok) {
-        // Update the login state in context
-        setLoggedIn(true);
-        
-        // Navigate to the dashboard or the original destination
+        // Refresh auth status, username, and fetch user articles
+        await checkAuthStatus();
         console.log("Authentication successful, redirecting to:", from);
         navigate(from, { replace: true });
       } else {

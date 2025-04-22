@@ -56,6 +56,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }
       const data = await response.json();
       setArticles(data);
+      console.log("Fetched articles:", data);
     } catch (error) {
       console.error("Error fetching articles:", error);
       setArticles([]); // Clear articles on error
@@ -93,11 +94,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       setUsername(null);
     } finally {
       setAuthLoading(false);
-      // Fetch articles *after* auth status is determined, using the resolved username
-      fetchArticles(fetchedUsername);
     }
-  // Depend on fetchArticles callback
-  }, [fetchArticles]);
+  }, []); // Only runs auth check, components fetch articles as needed
 
   const logout = useCallback(async () => {
     // ... logout logic remains the same ...

@@ -7,10 +7,9 @@ import Articles from "../components/Articles";
 import WeatherWidget from "../components/WeatherWidget";
 import { useAuth } from "../contexts/UserContext";
 import Spinner from "react-bootstrap/Spinner";
-import { useEffect } from "react";
 
 const Dashboard: React.FC = () => {
-  const { loading, username, checkAuthStatus, logout } = useAuth();
+  const { loading, username, logout } = useAuth();
   const navigate = useNavigate();
   
   if (loading) {
@@ -23,10 +22,6 @@ const Dashboard: React.FC = () => {
       </Container>
     );
   }
-
-  useEffect(() => {
-    console.log("Dashboard component loaded with username:", username);
-  }, [loading, username, checkAuthStatus]);
   
   return (
     <Container className="text-dark p-5">
@@ -53,7 +48,7 @@ const Dashboard: React.FC = () => {
             Log out
           </Button>
         </Card>
-        //<WeatherWidget />
+        {/* <WeatherWidget /> */}
       </Stack>
       <Card className="p-3">
         <h2>My Relationships</h2>

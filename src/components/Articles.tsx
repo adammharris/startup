@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Article from "./Article.tsx";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useArticles } from "../contexts/UserContext.tsx";
+import { useNavigate } from "react-router-dom";
+import { useArticles, useAuth } from "../contexts/UserContext.tsx";
 
 interface ArticleType {
   id: string;
@@ -31,12 +31,13 @@ const Articles: React.FC<ArticlesProps> = ({
   fixedUsername,
 }) => {
   const navigate = useNavigate();
-  const location = useLocation();
+  const { username: contextUsername } = useAuth();
   // When we’re pinned to a particular username (e.g. ShowBrain_Team),
   // keep that data in local state instead of the context cache.
   const [fixedArticles, setFixedArticles] = useState<ArticleType[]>([]);
   const { articles: contextArticles, fetchArticles, isLoading } = useArticles();
   const [localLoading, setLocalLoading] = useState<boolean>(false);
+  const lastUserRef = useRef<string | undefined>(undefined);
   
   const articles =
     propArticles ??
@@ -46,6 +47,10 @@ const Articles: React.FC<ArticlesProps> = ({
   useEffect(() => {
     if (!refreshOnMount) return;
     if (propArticles) return; // caller supplied its own data
+
+    const userToFetch = fixedUsername ?? contextUsername ?? undefined;
+    if (lastUserRef.current === userToFetch) return;
+    lastUserRef.current = userToFetch;
 
     // --------- Fixed‑username mode (e.g. Blog) ----------
     if (fixedUsername) {
@@ -82,15 +87,7 @@ const Articles: React.FC<ArticlesProps> = ({
       }
     };
     loadContext();
-  }, [
-    location,
-    refreshOnMount,
-    propArticles,
-    fixedUsername,
-    fixedArticles.length,
-    contextArticles.length,
-    fetchArticles,
-  ]);
+  }, [refreshOnMount, propArticles, fixedUsername, contextUsername]); // track contextUsername to adapt when it changes
   
   const handleDeleteArticle = async (id: string): Promise<void> => {
     try {
